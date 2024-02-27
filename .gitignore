@@ -1,0 +1,4 @@
+# Ignore le dossier node_modules
+/node_modules
+/.idea
+/public/css/build.css
