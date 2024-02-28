@@ -1,4 +1,12 @@
-# Ignore le dossier node_modules
-/node_modules
+# Ignore IDE auto generate files
 /.idea
-/public/css/build.css
+
+# Ignore auto generate components files
+/node_modules
+/public/build
+
+# Ignore linked folder
+/public/storage
+
+# Ignore logs folder
+/storage/logs
