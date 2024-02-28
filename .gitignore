@@ -9,8 +9,8 @@
 # Ignore linked folder
 /public/storage
 
-# Ignore logs folder
-/storage/logs
+# Ignore logs files
+/storage/logs/*
 
 # Ignore local environnements datas
 /.env

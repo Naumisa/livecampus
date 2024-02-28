@@ -1,9 +1,5 @@
 <?php
 // TODO: Make functions
-$isLoggedIn = isset($_SESSION['token']);
-
-if ($isLoggedIn)
-{
-	$username = $_SESSION['token'];
-}
+session_start();
+$isLoggedIn = isset($_SESSION['token']) && $_SESSION['token'] != null;
 

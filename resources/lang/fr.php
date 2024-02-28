@@ -14,12 +14,19 @@ return [
 
 	// Navigation
 	'navigation.title' => 'LiveTransfer',
+
+	// Navigation: logged out
 	'navigation.home' => 'Accueil',
 	'navigation.services' => 'Services',
 	'navigation.contact' => 'Contact',
-	'navigation.file' => 'Téléverser',
 	'navigation.login' => 'Connexion',
 	'navigation.register' => 'S\'enregistrer',
+
+	// Navigation: logged in
+	'navigation.dashboard' => 'Tableau de bord',
+	'navigation.file' => 'Téléverser',
+	'navigation.profile' => 'Mon compte',
+	'navigation.logout' => 'Se déconnecter',
 
 	// Page d'accueil
 	'home.title' => 'Accueil',
@@ -38,8 +45,19 @@ return [
 
 	// Page de Connexion
 	'login.title' => 'Connexion',
+	'login.email' => 'Adresse e-mail',
+	'login.password' => 'Mot de passe',
+
+	// Page de Déconnexion
+	'logout.title' => 'Déconnexion',
+	'logout.description' => 'Vous avez été déconnecté et ne pourrez donc plus accéder à vos fichiers avant votre
+							prochaine authentication.',
+	'logout.validation' => 'Retour à l\'accueil',
 
 	// Page d'Enregistrement
 	'register.title' => 'S\'enregistrer',
+	'register.email' => 'Adresse e-mail',
+	'register.password' => 'Mot de passe',
+	'register.password_confirmation' => 'Confirmation du mot de passe'
 
 ];

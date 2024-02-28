@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @param string $key
+ * @return string
+ */
 function app_get_path (string $key): string
 {
 	$paths = [
@@ -7,7 +11,7 @@ function app_get_path (string $key): string
 		'views' 			=> '../resources/views/',
 		'controllers' 		=> '../app/Controllers/',
 		'models' 			=> '../app/Models/',
-		'public_storage' 	=> './storage/',
+		'public_storage' 	=> '/storage/',
 		'logs' 				=> '../storage/logs/',
 	];
 
@@ -42,8 +46,6 @@ function app_get_environment(): void
 		}
 	}
 }
-
-session_start();
 
 app_get_environment();
 

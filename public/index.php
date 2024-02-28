@@ -1,15 +1,14 @@
 <?php
 	require_once ("../config/app.php");
-	$page = routes_get_page() == '' ? 'home' : routes_get_page();
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8">
-		<title><?= lang_get('title'), ' - ', lang_get("navigation.$page") ?></title>
-		<link rel="icon" type="image/png" href="/images/favicon.png" />
-		<link rel="stylesheet" href="/build/app.css">
+		<title><?= lang_get('title'), ' - ', lang_get("navigation." . routes_get_route()) ?></title>
+		<link rel="icon" type="image/png" href="<?= app_get_path('public_storage') ?>images/favicon.png" />
+		<link rel="stylesheet" href="/build/app.css?<?= time() ?>">
 	</head>
 	<body>
 		<header class="bg-red">
