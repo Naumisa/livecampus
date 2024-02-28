@@ -34,7 +34,7 @@ function getController(): array
 
 	if (!array_key_exists(getPage(), $routes))
 	{
-		logFile("[" . date('Y-m-d H:i:s') . "] /" . getPage() . " was attempted to be loaded but Controller doesn't exist.\n");
+		logFile("/" . getPage() . " was attempted to be loaded but Controller doesn't exist.");
 		// Redirige vers la page d'accueil dans le cas où la page souhaitée n'existe pas.
 		header("Location: /");
 		die();
@@ -65,13 +65,13 @@ function getView(array $controller): void
 		}
 		else
 		{
-			$logMessage = "[" . date('Y-m-d H:i:s') . "] View file " . $result['view'] . " not found.\n";
+			$logMessage = "View file " . $result['view'] . " not found.";
 			logFile($logMessage);
 		}
 	}
 	else
 	{
-		$logMessage = "[" . date('Y-m-d H:i:s') . "] Function $functionName not found.\n";
+		$logMessage = "Function $functionName not found.";
 		logFile($logMessage);
 	}
 }
