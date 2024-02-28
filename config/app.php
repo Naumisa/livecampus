@@ -5,11 +5,19 @@ $storagePath = "./storage";
 $viewsPath = "$resourcesPath/views";
 $controllersPath = "../app/Controllers";
 
-    $controllerPath = "$appPath/controllers";
-    $vuesPath = "$resourcesPath/vues";
+$configs = [
+	'routes',
+	'languages',
+	'auth',
+	'logging',
+];
 
-    $page = filter_input(INPUT_GET, "page") !== null ? htmlspecialchars(filter_input(INPUT_GET, "page")) : 'home';
+foreach ($configs as $config)
+{
+	require_once ("../config/$config.php");
+}
 
 $languages = getLangKeys("fr");
 
-    $lang = require_once("$resourcesPath/lang/fr.php");
+$page = getPage();
+$controller = getController();
