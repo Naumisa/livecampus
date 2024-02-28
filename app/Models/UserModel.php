@@ -3,6 +3,9 @@
 function user_get_table (): string
 { return 'users'; }
 
+/**
+ * @return array[]
+ */
 function user_get_fields (): array
 {
 	return [

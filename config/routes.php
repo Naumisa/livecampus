@@ -7,17 +7,42 @@ function routes_get_navigation(): array
 {
 	$path = app_get_path('controllers');
 	return [
-		'' => ['GET', "$path/HomeController.php", 'index'],
-		'home' => ['GET', "$path/HomeController.php", 'index'],
-		'services' => ['GET', "$path/ServicesController.php", 'index'],
-		'contact' => ['GET', "$path/ContactController.php", 'index'],
-		'login' => ['GET', "$path/LoginController.php", 'index'],
-            'login/confirm' => ['POST', "$path/LoginController.php", 'login'],
-		'register' => ['GET', "$path/RegisterController.php", 'index'],
-		'user/profile' => ['GET', "$path/UserController.php", 'profile'],
-        'file' => ['GET', "$path/FileController.php", 'index'],
+		// 'lien/lien'			=> ['Methode requise'], "Controller", 'function du Controller', '<nom de la route>'],
 
+		'' 						=> ['GET', "$path/HomeController.php", 'index', 'home'],
+		'home' 					=> ['GET', "$path/HomeController.php", 'index', 'home'],
+
+		'services' 				=> ['GET', "$path/ServicesController.php", 'index', 'services'],
+
+		'contact' 				=> ['GET', "$path/ContactController.php", 'index', 'contact'],
+
+		'user/profile' 			=> ['GET', "$path/UserController.php", 'index', 'profile'],
+		'user/dashboard' 		=> ['GET', "$path/UserController.php", 'dashboard', 'dashboard'],
+		'user/login' 			=> ['GET', "$path/UserController.php", 'login', 'login'],
+		'user/login/confirm' 	=> ['POST', "$path/UserController.php", 'login_attempt', "login.confirmation"],
+		'user/register' 		=> ['GET', "$path/UserController.php", 'register', 'register'],
+		'user/register/confirm' => ['POST', "$path/UserController.php", 'register_attempt', 'register.confirmation'],
+		'user/logout' 			=> ['GET', "$path/UserController.php", 'logout', 'logout'],
+
+        'file' 					=> ['GET', "$path/FileController.php", 'index', 'file'],
 	];
+}
+
+/**
+ * @param string $key
+ * @return string
+ */
+function routes_go_to_route(string $key): string
+{
+	$routes = routes_get_navigation();
+	foreach ($routes as $route => $values)
+	{
+		if ($values[3] === $key)
+		{
+			return "/$route";
+		}
+	}
+	return '/';
 }
 
 /**
@@ -28,6 +53,25 @@ function routes_get_page(): string
 	$request = filter_input(INPUT_SERVER, 'REQUEST_URI');
 	$page = parse_url($request, PHP_URL_PATH);
 	return ltrim($page, '/');
+}
+
+/**
+ * @return string
+ */
+function routes_get_route(): string
+{
+	$request = routes_get_page();
+	$routes = routes_get_navigation();
+
+	foreach ($routes as $route => $value)
+	{
+		if ($route === $request)
+		{
+			return $value[3];
+		}
+	}
+
+	return '';
 }
 
 /**
