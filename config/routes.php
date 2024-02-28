@@ -3,22 +3,23 @@
 /**
  * @return array[]
  */
-function getRoutes(): array
+function routes_get_navigation(): array
 {
+	$path = app_get_path('controllers');
 	return [
-		'' => [getControllersPath() . "/HomeController.php", 'index'],
-		'home' => [getControllersPath() . "/HomeController.php", 'index'],
-		'services' => [getControllersPath() . "/ServicesController.php", 'index'],
-		'contact' => [getControllersPath() . "/ContactController.php", 'index'],
-		'login' => [getControllersPath() . "/LoginController.php", "index"],
-		'register' => [getControllersPath() . "/RegisterController.php", "index"],
+		'' => ["$path/HomeController.php", 'index'],
+		'home' => ["$path/HomeController.php", 'index'],
+		'services' => ["$path/ServicesController.php", 'index'],
+		'contact' => ["$path/ContactController.php", 'index'],
+		'login' => ["$path/LoginController.php", "index"],
+		'register' => ["$path/RegisterController.php", "index"],
 	];
 }
 
 /**
  * @return string
  */
-function getPage(): string
+function routes_get_page(): string
 {
 	$request = filter_input(INPUT_SERVER, 'REQUEST_URI');
 	$page = parse_url($request, PHP_URL_PATH);
@@ -28,26 +29,26 @@ function getPage(): string
 /**
  * @return array
  */
-function getController(): array
+function routes_get_controller(): array
 {
-	$routes = getRoutes();
+	$routes = routes_get_navigation();
 
-	if (!array_key_exists(getPage(), $routes))
+	if (!array_key_exists(routes_get_page(), $routes))
 	{
-		logFile("/" . getPage() . " was attempted to be loaded but Controller doesn't exist.");
+		log_file("/" . routes_get_page() . " was attempted to be loaded but Controller doesn't exist.");
 		// Redirige vers la page d'accueil dans le cas où la page souhaitée n'existe pas.
 		header("Location: /");
 		die();
 	}
 
-	return $routes[getPage()];
+	return $routes[routes_get_page()];
 }
 
 /**
  * @param array $controller
  * @return void
  */
-function getView(array $controller): void
+function routes_get_view(array $controller): void
 {
 	include_once ($controller[0]);
 
@@ -55,8 +56,8 @@ function getView(array $controller): void
 
 	if (function_exists($functionName))
 	{
-		$result = $functionName(getViewsPath());
-		$file = getViewsPath() . '/' . $result['view'] . '.php';
+		$result = $functionName(app_get_path('views'));
+		$file = app_get_path('views') . '/' . $result['view'] . '.php';
 
 		if (isset($result['view']) && file_exists($file))
 		{
@@ -66,12 +67,12 @@ function getView(array $controller): void
 		else
 		{
 			$logMessage = "View file " . $result['view'] . " not found.";
-			logFile($logMessage);
+			log_file($logMessage);
 		}
 	}
 	else
 	{
 		$logMessage = "Function $functionName not found.";
-		logFile($logMessage);
+		log_file($logMessage);
 	}
 }

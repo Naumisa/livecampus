@@ -1,43 +1,27 @@
 <?php
 
-/**
- * @return string
- */
-function getResourcesPath (): string
-{ return "../resources"; }
+function app_get_path (string $key): string
+{
+	$paths = [
+		'resources' 		=> '../resources/',
+		'views' 			=> '../resources/views/',
+		'controllers' 		=> '../app/Controllers/',
+		'models' 			=> '../app/Models/',
+		'public_storage' 	=> './storage/',
+		'logs' 				=> '../storage/logs/',
+	];
 
-/**
- * @return string
- */
-function getStoragePath (): string
-{ return "./storage"; }
-
-/**
- * @return string
- */
-function getViewsPath (): string
-{ return getResourcesPath() . "/views"; }
-
-/**
- * @return string
- */
-function getControllersPath (): string
-{ return "../app/Controllers"; }
-
-/**
- * @return string
- */
-function getLogFile (): string
-{ return "../storage/logs/latest.log"; }
+	return $paths[$key];
+}
 
 /**
  * @return void
  */
-function getEnvironment(): void
+function app_get_environment(): void
 {
 	$path = "../.env";
 	if (!file_exists($path)) {
-		logFile("The .env file doesn't exist : $path");
+		log_file("The .env file doesn't exist : $path");
 	}
 
 	$lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -59,7 +43,7 @@ function getEnvironment(): void
 	}
 }
 
-getEnvironment();
+app_get_environment();
 
 $configs = [
 	'routes',
@@ -74,9 +58,11 @@ foreach ($configs as $config)
 	require_once ("../config/$config.php");
 }
 
-$languages = getLangKeys("fr");
+$languages = lang_get_array(getenv('DEFAULT_LANG') ?? 'fr');
 
+// TODO: Use this for Authentification
 include_once (app_get_path('models') . "UserModel.php");
 
 user_migrate();
 user_create(user_get_data_array("admin", "admin@email.com", "password", 1));
+// END-TODO

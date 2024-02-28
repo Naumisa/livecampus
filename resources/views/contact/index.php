@@ -1,3 +1,3 @@
 <section id="login">
-	<h2><?= getLang('contact.title') ?></h2>
+	<h2><?= lang_get('contact.title') ?></h2>
 </section>

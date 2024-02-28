@@ -33,9 +33,9 @@ function db_get_password(): string
 }
 
 /**
- * @return PDO
+ * @return PDO|null
  */
-function db_connect(): PDO
+function db_connect(): PDO|null
 {
 	$options = [
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -52,8 +52,8 @@ function db_connect(): PDO
 	}
 	catch (Exception $e)
 	{
-		logFile("Erreur lors de la connexion à la database : " . $e->getMessage());
-		die();
+		log_file("Erreur lors de la connexion à la database : " . $e->getMessage());
+		return null;
 	}
 
 	return $db;
@@ -61,20 +61,27 @@ function db_connect(): PDO
 
 /**
  * @param string $table
- * @return array
+ * @return array|null
  */
-function db_fetch_table(string $table): array
+function db_fetch_table(string $table): array|null
 {
 	$db = db_connect();
+
+	if ($db == null)
+	{
+		return null;
+	}
+
 	$query = 'SELECT * FROM ' . $table;
 	$result = $db->prepare($query);
-	try {
+	try
+	{
 		$result->execute();
 	}
 	catch (PDOException $e)
 	{
-		logFile("Erreur lors de la récupération de la table : " . $e->getMessage());
-		die();
+		log_file("Erreur lors de la récupération de la table : " . $e->getMessage());
+		return null;
 	}
 	return $result->fetchAll();
 }
@@ -83,11 +90,17 @@ function db_fetch_table(string $table): array
  * @param string $table
  * @param string $column
  * @param $value
- * @return array
+ * @return array|false
  */
-function db_fetch_data(string $table, string $column, $value): array
+function db_fetch_data(string $table, string $column, $value): array|null
 {
 	$db = db_connect();
+
+	if ($db == null)
+	{
+		return null;
+	}
+
 	$query = 'SELECT * FROM ' . $table . ' WHERE ' . $column . ' = :value';
 	$result = $db->prepare($query);
 	try {
@@ -97,20 +110,27 @@ function db_fetch_data(string $table, string $column, $value): array
 	}
 	catch (PDOException $e)
 	{
-		logFile("Erreur lors de la récupération des données : " . $e->getMessage());
-		die();
+		log_file("Erreur lors de la récupération des données : " . $e->getMessage());
+		return null;
 	}
+
 	return $result->fetchAll();
 }
 
 /**
  * @param string $table
  * @param array $data
- * @return void
+ * @return bool
  */
-function db_create_table(string $table, array $data): void
+function db_create_table(string $table, array $data): bool
 {
 	$db = db_connect();
+
+	if ($db == null)
+	{
+		return false;
+	}
+
 	$query = "CREATE TABLE IF NOT EXISTS $table (";
 
 	$columns = [];
@@ -122,11 +142,17 @@ function db_create_table(string $table, array $data): void
 	$query .= implode(", ", $columns);
 	$query .= ");";
 
-	try {
+	try
+	{
 		$db->exec($query);
-	} catch (PDOException $e) {
-		logFile ("Erreur lors de la création de la table : " . $e->getMessage());
 	}
+	catch (PDOException $e)
+	{
+		log_file ("Erreur lors de la création de la table : " . $e->getMessage());
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -137,6 +163,11 @@ function db_create_table(string $table, array $data): void
 function db_insert(string $table, array $data): bool
 {
 	$db = db_connect();
+
+	if ($db == null)
+	{
+		return false;
+	}
 
 	$columns = implode(', ', array_keys($data));
 	$placeholders = ':' . implode(', :', array_keys($data));
@@ -154,7 +185,7 @@ function db_insert(string $table, array $data): bool
 	}
 	catch (PDOException $e)
 	{
-		logFile("Erreur lors de l'insertion dans la table : " . $e->getMessage());
+		log_file("Erreur lors de l'insertion dans la table : " . $e->getMessage());
 		return false;
 	}
 
@@ -165,11 +196,16 @@ function db_insert(string $table, array $data): bool
  * @param string $table
  * @param int $id
  * @param array $data => ['column1' => 'value1', 'column2' => 'value2', ...]
- * @return void
+ * @return bool
  */
-function db_update(string $table, int $id, array $data): void
+function db_update(string $table, int $id, array $data): bool
 {
 	$db = db_connect();
+
+	if ($db == null)
+	{
+		return false;
+	}
 
 	$sets = [];
 	foreach ($data as $column => $value) {
@@ -191,8 +227,11 @@ function db_update(string $table, int $id, array $data): void
 	}
 	catch (PDOException $e)
 	{
-		logFile("Erreur lors de la mise à jour de la table : " . $e->getMessage());
+		log_file("Erreur lors de la mise à jour de la table : " . $e->getMessage());
+		return false;
 	}
+
+	return true;
 }
 
 /**
@@ -212,7 +251,7 @@ function db_create_model(string $modelTable, array $modelFields, array $modelDat
 			continue;
 		}
 
-		$fetched = count(db_fetch_data(getUser_table(), $field, $modelData[$field]));
+		$fetched = count(db_fetch_data(user_get_table(), $field, $modelData[$field]));
 		if ($fetched > 0)
 		{
 			$isUnique = false;
@@ -236,13 +275,13 @@ function db_create_model(string $modelTable, array $modelFields, array $modelDat
 			}
 			else
 			{
-				logFile("$field is not in type " . $details['type']);
+				log_file("$field is not in type " . $details['type']);
 				break;
 			}
 		}
 		elseif ($details['required'])
 		{
-			logFile("$field is required but not filled.");
+			log_file("$field is required but not filled.");
 			break;
 		}
 	}
@@ -264,7 +303,7 @@ function db_verify_data($data, string $type): bool
 		case 'string':
 			return is_string($data);
 		default:
-			logFile("Value type is not compatible or not yet implemented.");
+			log_file("Value type is not compatible or not yet implemented.");
 			return false;
 	}
 }
