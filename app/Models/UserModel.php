@@ -106,3 +106,56 @@ function user_update(int $id, array $data): void
 		log_file("Attempted to create a duplicate user.");
 	}
 }
+
+/**
+ * @param int $id
+ * @return array
+ */
+function user_get_data_with_id (int $id): array
+{
+	return db_fetch_data(user_get_table(), 'id', $id);
+}
+
+/**
+ * @param string $email
+ * @return array
+ */
+function user_get_data_with_email (string $email): array
+{
+	return db_fetch_data(user_get_table(), 'email', $email);
+}
+
+/**
+ * @param string $token
+ * @return array
+ */
+function user_get_data_with_token (string $token): array
+{
+	return db_fetch_data(user_get_table(), 'remember_token', $token);
+}
+
+/**
+ * @return array|null
+ */
+function user_get_actual (): array|null
+{
+	if (isset($_SESSION['token']))
+	{
+		return user_get_data_with_token($_SESSION['token']);
+	}
+	else
+	{
+		return null;
+	}
+}
+
+/**
+ * @param int $id
+ * @param string $password
+ * @return bool
+ */
+function user_confirm_password (int $id, string $password): bool
+{
+	$user = user_get_actual();
+	return password_verify($password, $user['password']);
+}
