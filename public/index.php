@@ -9,7 +9,7 @@
 		<meta charset="UTF-8">
 		<title><?= lang_get('title'), ' - ', lang_get("navigation.$page") ?></title>
 		<link rel="icon" type="image/png" href="<?= app_get_path('public_storage') ?>images/favicon.png" />
-		<link rel="stylesheet" href="build/app.css">
+		<link rel="stylesheet" href="/build/app.css">
 	</head>
 	<body>
 		<header class="bg-red">
@@ -25,6 +25,6 @@
 		</footer>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-		<script src="build/app.js"></script>
+		<script src="/build/app.js"></script>
 	</body>
 </html>
