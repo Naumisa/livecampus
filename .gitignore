@@ -1,5 +1,6 @@
 # Ignore IDE auto generate files
 /.idea
+/.vscode
 
 # Ignore auto generate components files
 /node_modules
@@ -13,3 +14,4 @@
 
 # Ignore local environnements datas
 /.env
+/package-lock.json
