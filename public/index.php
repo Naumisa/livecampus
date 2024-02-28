@@ -18,13 +18,7 @@
 		</header>
 
 		<main>
-			<?php
-				if ($controller != null)
-                {
-					require_once ($controller);
-				}
-				include_once ($vue);
-			?>
+			<?php getView($controller); ?>
 		</main>
 
 		<footer>
