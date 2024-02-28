@@ -43,8 +43,8 @@
 
                 <?php if ($isLoggedIn): ?>
 					<li>
-						<a href="/upload" <?= routes_get_page() === 'upload' ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
-                            <?= lang_get('navigation.upload') ?>
+						<a href="/file" <?= routes_get_page() === 'file' ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
+                            <?= lang_get('navigation.file') ?>
 						</a>
 					</li>
 					<li>

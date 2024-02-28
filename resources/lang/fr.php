@@ -17,7 +17,7 @@ return [
 	'navigation.home' => 'Accueil',
 	'navigation.services' => 'Services',
 	'navigation.contact' => 'Contact',
-	'navigation.upload' => 'Téléverser',
+	'navigation.file' => 'Téléverser',
 	'navigation.login' => 'Connexion',
 	'navigation.register' => 'S\'enregistrer',
 
@@ -34,11 +34,12 @@ return [
 	'contact.title' => 'Nous contacter',
 
 	// Page de Téléversement
-	'upload.title' => 'Téléverser',
+	'file.title' => 'Téléverser',
 
 	// Page de Connexion
 	'login.title' => 'Connexion',
 
 	// Page d'Enregistrement
 	'register.title' => 'S\'enregistrer',
+
 ];

@@ -1,9 +1,9 @@
 <?php
 // TODO: Make functions
-$isLoggedIn = isset($_SESSION['username']);
+$isLoggedIn = isset($_SESSION['token']);
 
 if ($isLoggedIn)
 {
-	$username = $_SESSION['username'];
+	$username = $_SESSION['token'];
 }
 

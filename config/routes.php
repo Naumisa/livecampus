@@ -12,9 +12,11 @@ function routes_get_navigation(): array
 		'services' => ['GET', "$path/ServicesController.php", 'index'],
 		'contact' => ['GET', "$path/ContactController.php", 'index'],
 		'login' => ['GET', "$path/LoginController.php", 'index'],
-			'login/confirm' => ['POST', "$path/LoginController.php", 'login'],
+            'login/confirm' => ['POST', "$path/LoginController.php", 'login'],
 		'register' => ['GET', "$path/RegisterController.php", 'index'],
 		'user/profile' => ['GET', "$path/UserController.php", 'profile'],
+        'file' => ['GET', "$path/FileController.php", 'index'],
+
 	];
 }
 
