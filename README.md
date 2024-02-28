@@ -32,6 +32,11 @@ ln -r -s ./resources/js/app.js ./public/build/app.js
 
 ### Back
 
-1 - Installation des tables requises
+1 - Modification du fichier environnement
+
+- Editez les valeurs du fichier `example.env` selon vos données d'installation.
+- Renommez ce fichier en `.env`.
+
+2 - Installation des tables requises
 
 *Coming soon*
