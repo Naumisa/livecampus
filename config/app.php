@@ -43,6 +43,8 @@ function app_get_environment(): void
 	}
 }
 
+session_start();
+
 app_get_environment();
 
 $configs = [
@@ -64,5 +66,8 @@ $languages = lang_get_array(getenv('DEFAULT_LANG') ?? 'fr');
 include_once (app_get_path('models') . "UserModel.php");
 
 user_migrate();
-user_create(user_get_data_array("admin", "admin@email.com", "password", 1));
+if (count(user_get_data_with_email('admin@email.com')) == 0)
+{
+	user_create(user_get_data_array("admin", "admin@email.com", "password", 1));
+}
 // END-TODO

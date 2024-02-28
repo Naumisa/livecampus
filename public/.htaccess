@@ -1,10 +1,16 @@
 <IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
 	RewriteEngine On
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
 
 	# Ne pas rediriger si la requête correspond à un fichier ou un répertoire existant
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
-
-	# Sinon, rediriger toutes les requêtes vers index.php
 	RewriteRule ^ index.php [L]
 </IfModule>

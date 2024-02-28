@@ -84,13 +84,18 @@ function user_migrate(): void
 
 /**
  * @param array $data
- * @return void
+ * @return array|null
  */
-function user_create(array $data): void
+function user_create(array $data): ?array
 {
 	if (!db_create_model(user_get_table(), user_get_fields(), $data))
 	{
 		log_file("Attempted to create a duplicate user.");
+		return null;
+	}
+	else
+	{
+		return user_get_data_with_email($data['email']);
 	}
 }
 
@@ -137,11 +142,11 @@ function user_get_data_with_token (string $token): array
 /**
  * @return array|null
  */
-function user_get_actual (): array|null
+function user_get_actual (): ?array
 {
 	if (isset($_SESSION['token']))
 	{
-		return user_get_data_with_token($_SESSION['token']);
+		return user_get_data_with_token($_SESSION['token'])[0];
 	}
 	else
 	{
@@ -158,4 +163,16 @@ function user_confirm_password (int $id, string $password): bool
 {
 	$user = user_get_actual();
 	return password_verify($password, $user['password']);
+}
+
+/**
+ * @return string
+ * @throws \Random\RandomException
+ */
+function user_generate_tokens(): string
+{
+	$selector = bin2hex(random_bytes(16));
+	$validator = bin2hex(random_bytes(32));
+
+	return $selector . ':' . $validator;
 }

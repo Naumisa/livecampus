@@ -7,12 +7,14 @@ function routes_get_navigation(): array
 {
 	$path = app_get_path('controllers');
 	return [
-		'' => ["$path/HomeController.php", 'index'],
-		'home' => ["$path/HomeController.php", 'index'],
-		'services' => ["$path/ServicesController.php", 'index'],
-		'contact' => ["$path/ContactController.php", 'index'],
-		'login' => ["$path/LoginController.php", "index"],
-		'register' => ["$path/RegisterController.php", "index"],
+		'' => ['GET', "$path/HomeController.php", 'index'],
+		'home' => ['GET', "$path/HomeController.php", 'index'],
+		'services' => ['GET', "$path/ServicesController.php", 'index'],
+		'contact' => ['GET', "$path/ContactController.php", 'index'],
+		'login' => ['GET', "$path/LoginController.php", 'index'],
+			'login/confirm' => ['POST', "$path/LoginController.php", 'login'],
+		'register' => ['GET', "$path/RegisterController.php", 'index'],
+		'user/profile' => ['GET', "$path/UserController.php", 'profile'],
 	];
 }
 
@@ -50,9 +52,17 @@ function routes_get_controller(): array
  */
 function routes_get_view(array $controller): void
 {
-	include_once ($controller[0]);
+	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $controller[0];
 
-	$functionName = $controller[1];
+	if (!$isGoodRequest)
+	{
+		header('Location: /');
+		die();
+	}
+
+	include_once ($controller[1]);
+
+	$functionName = $controller[2];
 
 	if (function_exists($functionName))
 	{
