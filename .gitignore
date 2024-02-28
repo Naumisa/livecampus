@@ -10,3 +10,6 @@
 
 # Ignore logs folder
 /storage/logs
+
+# Ignore local environnements datas
+/.env
