@@ -1,27 +1,44 @@
 <?php
-	return [
-		'web_title' => 'LiveTransfer',
 
-		'title' => 'LiveTransfer',
-        'contact_us' => 'NOUS CONTACTER',
-        'home' => 'Accueil',
-        'menu' => 'Menu',
-        'services' => 'Services',
-        'contact' => 'Contact',
-        'location' => 'Localisation',
-        'login' => 'Connexion',
+/*
+|--------------------------------------------------------------------------
+| Fichier de traduction français
+|--------------------------------------------------------------------------
+|
+| Les lignes suivantes sont utilisées pour remplacer les key de traduction
+| Exemple : getLang("navigation.title");
+|
+*/
+return [
+	'title' => 'LiveTransfer',
 
-        'menu.title' => 'Notre carte',
-        'menu.entrees' => 'Entrées',
-        'menu.meals' => 'Plats',
-        'menu.deserts' => 'Desserts',
+	// Navigation
+	'navigation.title' => 'LiveTransfer',
+	'navigation.home' => 'Accueil',
+	'navigation.services' => 'Services',
+	'navigation.contact' => 'Contact',
+	'navigation.upload' => 'Téléverser',
+	'navigation.login' => 'Connexion',
+	'navigation.register' => 'S\'enregistrer',
 
-        'services.title' => 'Nos services',
-        'services.service_01' => 'Toutes nos préparations sont réalisés sur place.',
-        'services.service_02' => 'Nos aliments sont frais, locaux et sélectionnés avec soins.',
-        'services.service_03' => 'Accueil et service agréable et de qualité.',
+	// Page d'accueil
+	'home.title' => 'Accueil',
 
-        'contact.title' => 'Nous contacter',
+	// Page de Services
+	'services.title' => 'Nos services',
+	'services.service_01' => 'Toutes nos préparations sont réalisés sur place.',
+	'services.service_02' => 'Nos aliments sont frais, locaux et sélectionnés avec soins.',
+	'services.service_03' => 'Accueil et service agréable et de qualité.',
 
-        'location.title' => 'Nous trouver',
-	];
+	// Page de Contact
+	'contact.title' => 'Nous contacter',
+
+	// Page de Téléversement
+	'upload.title' => 'Téléverser',
+
+	// Page de Connexion
+	'login.title' => 'Connexion',
+
+	// Page d'Enregistrement
+	'register.title' => 'S\'enregistrer',
+];

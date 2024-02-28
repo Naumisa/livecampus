@@ -1,14 +1,16 @@
 <?php
 	require_once ("../config/app.php");
+	global $resourcesPath, $page, $controller;
+	if ($page === '') $page = 'home';
 ?>
 
 <!DOCTYPE html>
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8">
-		<title><?= $lang['web_title'], ' - ', $lang[$page] ?></title>
-		<link rel="icon" type="image/png" href="images/favicon.png" />
-		<link rel="stylesheet" href="css/build.css">
+		<title><?= getLang('title'), ' - ', getLang("navigation.$page") ?></title>
+		<link rel="icon" type="image/png" href="./storage/images/favicon.png" />
+		<link rel="stylesheet" href="build/app.css">
 	</head>
 	<body>
 		<header class="bg-red">
@@ -28,5 +30,8 @@
 		<footer>
             <?php include_once ("$resourcesPath/layouts/footer.php") ?>
 		</footer>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+		<script src="build/app.js"></script>
 	</body>
 </html>
