@@ -1,7 +1,6 @@
 <?php
 	require_once ("../config/app.php");
-	global $resourcesPath, $page, $controller;
-	if ($page === '') $page = 'home';
+	$page = getPage() == '' ? 'home' : getPage();
 ?>
 
 <!DOCTYPE html>
@@ -14,15 +13,15 @@
 	</head>
 	<body>
 		<header class="bg-red">
-			<?php include_once ("$resourcesPath/layouts/navigation.php") ?>
+			<?php include_once (getResourcesPath(). "/layouts/navigation.php") ?>
 		</header>
 
 		<main>
-			<?php getView($controller); ?>
+			<?php getView(getController()); ?>
 		</main>
 
 		<footer>
-            <?php include_once ("$resourcesPath/layouts/footer.php") ?>
+            <?php include_once (getResourcesPath(). "/layouts/footer.php") ?>
 		</footer>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>

@@ -6,10 +6,8 @@
  */
 function getLangKeys (string $language): array
 {
-	global $resourcesPath;
-
 	$languagesPath = [
-		'fr' => "$resourcesPath/lang/fr.php",
+		'fr' => getResourcesPath() . "/lang/fr.php",
 	];
 
 	return require_once($languagesPath[$language]);

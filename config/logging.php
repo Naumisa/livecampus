@@ -6,6 +6,5 @@
  */
 function logFile(string $message): void
 {
-	$logFile = "../storage/logs/latest.log";
-	file_put_contents($logFile, $message, FILE_APPEND);
+	file_put_contents(getLogFile(), $message, FILE_APPEND);
 }

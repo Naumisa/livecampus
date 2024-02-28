@@ -5,15 +5,13 @@
  */
 function getRoutes(): array
 {
-	global $controllersPath;
-
 	return [
-		'' => ["$controllersPath/HomeController.php", 'index'],
-		'home' => ["$controllersPath/HomeController.php", 'index'],
-		'services' => ["$controllersPath/ServicesController.php", 'index'],
-		'contact' => ["$controllersPath/ContactController.php", 'index'],
-		'login' => ["$controllersPath/LoginController.php", "index"],
-		'register' => ["$controllersPath/RegisterController.php", "index"],
+		'' => [getControllersPath() . "/HomeController.php", 'index'],
+		'home' => [getControllersPath() . "/HomeController.php", 'index'],
+		'services' => [getControllersPath() . "/ServicesController.php", 'index'],
+		'contact' => [getControllersPath() . "/ContactController.php", 'index'],
+		'login' => [getControllersPath() . "/LoginController.php", "index"],
+		'register' => [getControllersPath() . "/RegisterController.php", "index"],
 	];
 }
 
@@ -32,18 +30,17 @@ function getPage(): string
  */
 function getController(): array
 {
-	global $page;
 	$routes = getRoutes();
 
-	if (!array_key_exists($page, $routes))
+	if (!array_key_exists(getPage(), $routes))
 	{
-		logFile("[" . date('Y-m-d H:i:s') . "] /$page was attempted to be loaded but Controller doesn't exist.\n");
+		logFile("[" . date('Y-m-d H:i:s') . "] /" . getPage() . " was attempted to be loaded but Controller doesn't exist.\n");
 		// Redirige vers la page d'accueil dans le cas où la page souhaitée n'existe pas.
 		header("Location: /");
 		die();
 	}
 
-	return $routes[$page];
+	return $routes[getPage()];
 }
 
 /**
@@ -58,9 +55,8 @@ function getView(array $controller): void
 
 	if (function_exists($functionName))
 	{
-		global $viewsPath;
-		$result = $functionName($viewsPath);
-		$file = $viewsPath . '/' . $result['view'] . '.php';
+		$result = $functionName(getViewsPath());
+		$file = getViewsPath() . '/' . $result['view'] . '.php';
 
 		if (isset($result['view']) && file_exists($file))
 		{

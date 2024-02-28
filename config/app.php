@@ -1,9 +1,34 @@
 <?php
 
-$resourcesPath = "../resources";
-$storagePath = "./storage";
-$viewsPath = "$resourcesPath/views";
-$controllersPath = "../app/Controllers";
+/**
+ * @return string
+ */
+function getResourcesPath (): string
+{ return "../resources"; }
+
+/**
+ * @return string
+ */
+function getStoragePath (): string
+{ return "./storage"; }
+
+/**
+ * @return string
+ */
+function getViewsPath (): string
+{ return getResourcesPath() . "/views"; }
+
+/**
+ * @return string
+ */
+function getControllersPath (): string
+{ return "../app/Controllers"; }
+
+/**
+ * @return string
+ */
+function getLogFile (): string
+{ return "../storage/logs/latest.log"; }
 
 $configs = [
 	'routes',
@@ -18,6 +43,3 @@ foreach ($configs as $config)
 }
 
 $languages = getLangKeys("fr");
-
-$page = getPage();
-$controller = getController();
