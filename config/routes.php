@@ -23,6 +23,7 @@ function routes_get_navigation(): array
 		'user/register' 		=> ['GET', "$path/UserController.php", 'register', 'register', false],
 		'user/register/confirm' => ['POST', "$path/UserController.php", 'register_attempt', 'register.confirmation', false],
 		'user/logout' 			=> ['GET', "$path/UserController.php", 'logout', 'logout', true],
+		'user/edit'             => ['POST', "$path/UserController.php", 'edit', 'profile.edit', true],
 
         'file' 					=> ['GET', "$path/FileController.php", 'index', 'file', true],
 	];

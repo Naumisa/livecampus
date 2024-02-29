@@ -87,6 +87,9 @@ return [
 	'register.title' => 'S\'enregistrer',
 	'register.email' => 'Adresse e-mail',
 	'register.password' => 'Mot de passe',
-	'register.password_confirmation' => 'Confirmation du mot de passe'
+	'register.password_confirmation' => 'Confirmation du mot de passe',
 
+	// Page des informations de l'utilisateur
+	'profile.title' => 'Vos informations',
+	'profile.edit.title' => 'Vos informations'
 ];

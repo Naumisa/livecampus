@@ -16,6 +16,53 @@ function index(): array
 /**
  * @return array
  */
+function edit() : array
+{
+	# Get current user's datas
+    $data['user'] = auth_user();
+
+    # Get user's new datas from the form
+    $new_username = trim(
+		filter_input(
+	        INPUT_POST,
+    	    'username',
+        	FILTER_DEFAULT
+    	)
+	);
+    $new_email = trim(
+		filter_input(
+	        INPUT_POST,
+    	    'email',
+        	FILTER_DEFAULT
+    	)
+	);
+
+    # Update user's datas if modified
+	if(
+		$data['user']['email'] !== $new_email ||
+		$data['user']['username'] !== $new_username
+	){
+    	$data['user']['email'] = $new_email;
+		$data['user']['username'] = $new_username;
+    	user_update(
+    	    $data['user']['id'],
+    	    [
+    	        'username' => $new_username,
+    	        'email' => $new_email
+    	    ]
+    	);
+	};
+
+    # Go back to profile page
+    return [
+        'data' => $data,
+        'view' => 'user/profile'
+    ];
+}
+
+/**
+ * @return array
+ */
 function login(): array
 {
 	$data = [];
