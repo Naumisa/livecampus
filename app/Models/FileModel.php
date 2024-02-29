@@ -63,6 +63,7 @@ function file_delete(int $id): void
     }
 }
 
+/* TODO-Hind : Correction de l'insertion
 function file_insert(int $userId, string $name_origine, string $name_random): void
 {
     $data = file_get_data_array(0, $name_origine, $name_random, 0);
@@ -71,6 +72,7 @@ function file_insert(int $userId, string $name_origine, string $name_random): vo
         log_file("Failed to insert file into database.");
     }
 }
+*/
 
 function file_get_by_user(int $userId): array
 {

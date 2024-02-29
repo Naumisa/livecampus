@@ -1,5 +1,7 @@
 <?php
 	require_once ("../config/app.php");
+
+	$root = __DIR__;
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +41,6 @@
 		</footer>
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-		<script src="./build/app.js"></script>
+		<script src="/build/app.js"></script>
 	</body>
 </html>
