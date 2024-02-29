@@ -62,3 +62,48 @@ function file_delete(int $id): void
         log_file("Attempted to delete file.");
     }
 }
+
+function file_insert(int $userId, string $name_origine, string $name_random): void
+{
+    $data = file_get_data_array(0, $name_origine, $name_random, 0);
+    $data['user_id'] = $userId;
+    if (!db_insert(file_get_table(), $data)) {
+        log_file("Failed to insert file into database.");
+    }
+}
+
+function file_get_by_user(int $userId): array
+{
+    $conditions = ['user_id' => $userId];
+    $files = db_select(file_get_table(), $conditions);
+    return $files ?: [];
+}
+
+// Fonction pour exécuter une requête de sélection dans la base de données
+function db_select(string $table, array $conditions = []): array
+{
+    // Connexion à la base de données (à remplacer par votre propre méthode de connexion)
+    $pdo = new PDO("mysql:host=localhost;livecampus", "root", "");
+
+    // Construction de la requête SQL
+    $query = "SELECT * FROM $table";
+    $params = [];
+    if (!empty($conditions)) {
+        $query .= " WHERE ";
+        $conditions_array = [];
+        foreach ($conditions as $key => $value) {
+            $conditions_array[] = "$key = :$key";
+            $params[":$key"] = $value;
+        }
+        $query .= implode(" AND ", $conditions_array);
+    }
+
+    // Préparation et exécution de la requête
+    $statement = $pdo->prepare($query);
+    $statement->execute($params);
+
+    // Récupération des résultats
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    return $results;
+}
