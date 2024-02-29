@@ -1,7 +1,9 @@
 <?php
 
 /**
- * @return string
+ * Récupère l'hôte de la base de données depuis les variables d'environnement ou utilise
+ * une valeur par défaut.
+ * @return string L'hôte de la base de données.
  */
 function db_get_host(): string
 {
@@ -9,7 +11,9 @@ function db_get_host(): string
 }
 
 /**
- * @return string
+ * Récupère le nom de la base de données depuis les variables d'environnement ou utilise
+ * une valeur par défaut.
+ * @return string Le nom de la base de données.
  */
 function db_get_database(): string
 {
@@ -17,7 +21,9 @@ function db_get_database(): string
 }
 
 /**
- * @return string
+ * Récupère le nom d'utilisateur pour la connexion à la base de données depuis les variables
+ * d'environnement ou utilise une valeur par défaut.
+ * @return string Le nom d'utilisateur de la base de données.
  */
 function db_get_username(): string
 {
@@ -25,7 +31,9 @@ function db_get_username(): string
 }
 
 /**
- * @return string
+ * Récupère le mot de passe pour la connexion à la base de données depuis les variables
+ * d'environnement ou utilise une valeur par défaut.
+ * @return string Le mot de passe de la base de données.
  */
 function db_get_password(): string
 {
@@ -33,9 +41,10 @@ function db_get_password(): string
 }
 
 /**
- * @return PDO|null
+ * Établit une connexion à la base de données et retourne l'objet PDO associé.
+ * * @return PDO|null L'objet PDO en cas de succès, ou null en cas d'échec.
  */
-function db_connect(): PDO|null
+function db_connect(): ?PDO
 {
 	$options = [
 		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -60,8 +69,9 @@ function db_connect(): PDO|null
 }
 
 /**
- * @param string $table
- * @return array|null
+ * Récupère toutes les entrées d'une table spécifique.
+ * @param string $table Le nom de la table à interroger.
+ * @return array|null Les données récupérées ou null en cas d'échec.
  */
 function db_fetch_table(string $table): array|null
 {
@@ -72,7 +82,7 @@ function db_fetch_table(string $table): array|null
 		return null;
 	}
 
-	$query = 'SELECT * FROM ' . $table;
+	$query = "SELECT * FROM $table";
 	$result = $db->prepare($query);
 	try
 	{
@@ -80,19 +90,20 @@ function db_fetch_table(string $table): array|null
 	}
 	catch (PDOException $e)
 	{
-		log_file("Erreur lors de la récupération de la table : " . $e->getMessage());
+		log_file("Erreur lors de la récupération de la table $table : " . $e->getMessage());
 		return null;
 	}
 	return $result->fetchAll();
 }
 
 /**
- * @param string $table
- * @param string $column
- * @param $value
- * @return array|false
+ * Récupère les données spécifiques d'une table en fonction d'une colonne et de sa valeur.
+ * @param string $table Le nom de la table à interroger.
+ * @param string $column Le nom de la colonne pour la condition WHERE.
+ * @param mixed $value La valeur à rechercher dans la colonne spécifiée.
+ * @return array|null Les données récupérées ou null en cas d'échec.
  */
-function db_fetch_data(string $table, string $column, $value): array|null
+function db_fetch_data(string $table, string $column, mixed $value): ?array
 {
 	$db = db_connect();
 
@@ -101,7 +112,7 @@ function db_fetch_data(string $table, string $column, $value): array|null
 		return null;
 	}
 
-	$query = 'SELECT * FROM ' . $table . ' WHERE ' . $column . ' = :value';
+	$query = "SELECT * FROM $table WHERE $column = :value";
 	$result = $db->prepare($query);
 	try {
 		$result->execute([
@@ -110,7 +121,7 @@ function db_fetch_data(string $table, string $column, $value): array|null
 	}
 	catch (PDOException $e)
 	{
-		log_file("Erreur lors de la récupération des données : " . $e->getMessage());
+		log_file("Erreur lors de la récupération des données depuis $table où $column = $value : " . $e->getMessage());
 		return null;
 	}
 
@@ -118,11 +129,14 @@ function db_fetch_data(string $table, string $column, $value): array|null
 }
 
 /**
- * @param string $table
- * @param array $data
- * @return bool
+ * Crée une nouvelle table en base de données avec les colonnes spécifiées.
+ * Peut également ajouter des contraintes de clé étrangère si spécifiées.
+ * @param string $table Le nom de la table à créer.
+ * @param array $data La définition des colonnes de la table.
+ * @param array|null $foreignData Les définitions des contraintes de clé étrangère, si présentes.
+ * @return bool True si la création réussit, False sinon.
  */
-function db_create_table(string $table, array $data): bool
+function db_create_table(string $table, array $data, array $foreignData = null): bool
 {
 	$db = db_connect();
 
@@ -131,16 +145,13 @@ function db_create_table(string $table, array $data): bool
 		return false;
 	}
 
-	$query = "CREATE TABLE IF NOT EXISTS $table (";
-
 	$columns = [];
 	foreach ($data as $name => $definition)
 	{
 		$columns[] = "$name " . $definition['query'];
 	}
 
-	$query .= implode(", ", $columns);
-	$query .= ");";
+	$query = "CREATE TABLE IF NOT EXISTS $table (" . implode(", ", $columns) . ");";
 
 	try
 	{
@@ -148,17 +159,34 @@ function db_create_table(string $table, array $data): bool
 	}
 	catch (PDOException $e)
 	{
-		log_file ("Erreur lors de la création de la table : " . $e->getMessage());
+		log_file ("Erreur lors de la création de la table $table : " . $e->getMessage());
 		return false;
+	}
+
+	if ($foreignData !== null)
+	{
+		foreach ($foreignData as $column => $definition)
+		{
+			$constraintQuery = "ALTER TABLE $table ADD CONSTRAINT $column FOREIGN KEY ($column) REFERENCES " . $definition['references'] . ";";
+			try
+			{
+				$db->exec($constraintQuery);
+			} catch (PDOException $e)
+			{
+				log_file("Erreur lors de l'ajout de la contrainte étrangère pour $column dans $table : " . $e->getMessage());
+				return false;
+			}
+		}
 	}
 
 	return true;
 }
 
 /**
- * @param string $table
- * @param array $data => ['column1' => 'value1', 'column2' => 'value2', ...]
- * @return bool
+ * Insère de nouvelles données dans une table spécifique.
+ * @param string $table Le nom de la table où insérer les données.
+ * @param array $data Les données à insérer sous forme de tableau associatif colonne => valeur.
+ * @return bool True si l'insertion réussit, False sinon.
  */
 function db_insert(string $table, array $data): bool
 {
@@ -175,17 +203,13 @@ function db_insert(string $table, array $data): bool
 	$query = "INSERT INTO $table ($columns) VALUES ($placeholders)";
 	$result = $db->prepare($query);
 
-	$values = [];
-	foreach ($data as $key => $value) {
-		$values[':' . $key] = $value;
-	}
-
-	try {
-		$result->execute($values);
+	try
+	{
+		$result->execute($data);
 	}
 	catch (PDOException $e)
 	{
-		log_file("Erreur lors de l'insertion dans la table : " . $e->getMessage());
+		log_file("Erreur lors de l'insertion dans la table $table : " . $e->getMessage());
 		return false;
 	}
 
@@ -193,10 +217,11 @@ function db_insert(string $table, array $data): bool
 }
 
 /**
- * @param string $table
- * @param int $id
- * @param array $data => ['column1' => 'value1', 'column2' => 'value2', ...]
- * @return bool
+ * Met à jour les données d'une entrée spécifique dans une table en fonction de son ID.
+ * @param string $table Le nom de la table à mettre à jour.
+ * @param int $id L'ID de l'entrée à mettre à jour.
+ * @param array $data Les nouvelles données sous forme de tableau associatif colonne => valeur.
+ * @return bool True si la mise à jour réussit, False sinon.
  */
 function db_update(string $table, int $id, array $data): bool
 {
@@ -216,24 +241,24 @@ function db_update(string $table, int $id, array $data): bool
 	$query = "UPDATE $table SET $setString WHERE id = :id";
 	$result = $db->prepare($query);
 
-	$data['id'] = $id;
-	$values = [];
-	foreach ($data as $key => $value) {
-		$values[':' . $key] = $value;
-	}
-
 	try {
-		$result->execute($values);
+		$result->execute($data);
 	}
 	catch (PDOException $e)
 	{
-		log_file("Erreur lors de la mise à jour de la table : " . $e->getMessage());
+		log_file("Erreur lors de la mise à jour de la table $table : " . $e->getMessage());
 		return false;
 	}
 
 	return true;
 }
 
+/**
+ * Supprime une entrée spécifique d'une table en fonction de son ID.
+ * @param string $table Le nom de la table où supprimer l'entrée.
+ * @param int $id L'ID de l'entrée à supprimer.
+ * @return bool True si la suppression réussit, False sinon.
+ */
 function db_delete(string $table, int $id): bool
 {
 	$db = db_connect();
@@ -243,26 +268,17 @@ function db_delete(string $table, int $id): bool
 		return false;
 	}
 
-	if (db_fetch_data($table, 'id', $id) != null)
-	{
-		$query = "DELETE FROM :table WHERE id = :id";
-		$result = $db->prepare($query);
+	$query = "DELETE FROM $table WHERE id = :id";
+	$result = $db->prepare($query);
 
-		try {
-			$result->execute([
-				'table' => $table,
-				'id' => $id,
-			]);
-		}
-		catch (PDOException $e)
-		{
-			log_file("Erreur de suppression: " . $e->getMessage());
-			return false;
-		}
+	try {
+		$result->execute([
+			'id' => $id,
+		]);
 	}
-	else
+	catch (PDOException $e)
 	{
-		log_file("Tentative de suppression dans $table de l'id $id mais l'objet n'existe pas.");
+		log_file("Erreur lors de la suppression dans la table $table : " . $e->getMessage());
 		return false;
 	}
 
@@ -270,54 +286,45 @@ function db_delete(string $table, int $id): bool
 }
 
 /**
- * @param string $modelTable
- * @param array $modelFields
- * @param array $modelData
- * @return bool
+ * Insère une nouvelle entrée dans la table spécifiée en respectant les contraintes de modèle.
+ * @param string $modelTable Le nom de la table dans laquelle insérer les données.
+ * @param array $modelFields Les champs du modèle avec leurs contraintes (type, unicité, etc.).
+ * @param array $modelData Les données à insérer sous forme de tableau associatif (colonne → valeur).
+ * @return bool Retourne true si l'insertion réussit, false en cas d'échec ou de non-respect des contraintes.
  */
 function db_create_model(string $modelTable, array $modelFields, array $modelData): bool
 {
 	$isUnique = true;
 
-	foreach ($modelFields as $field => $value)
+	foreach ($modelFields as $field => $details)
 	{
-		if (!$value['required'])
+		if (isset($details['unique']) && $details['unique'])
 		{
-			continue;
+			$existingData = db_fetch_data($modelTable, $field, $modelData[$field]);
+			if (!empty($existingData))
+			{
+				log_file("Violation d'unicité pour $field avec la valeur " . $modelData[$field]);
+				return false;
+			}
 		}
-
-		$fetched = count(db_fetch_data(user_get_table(), $field, $modelData[$field]));
-		if ($fetched > 0)
-		{
-			$isUnique = false;
-			break;
-		}
-	}
-
-	if (!$isUnique)
-	{
-		return false;
 	}
 
 	$data = [];
 	foreach ($modelFields as $field => $details)
 	{
+		if (!isset($modelData[$field]) && $details['required']) {
+			log_file("Champ requis manquant : $field");
+			return false;
+		}
+		elseif (isset($modelData[$field]) && !db_verify_data($modelData[$field], $details['type']))
+		{
+			log_file("Type de donnée invalide pour $field. Attendu : " . $details['type']);
+			return false;
+		}
+
 		if (isset($modelData[$field]))
 		{
-			if (db_verify_data($modelData[$field], $details['type']))
-			{
-				$data[$field] = $modelData[$field];
-			}
-			else
-			{
-				log_file("$field is not in type " . $details['type']);
-				break;
-			}
-		}
-		elseif ($details['required'])
-		{
-			log_file("$field is required but not filled.");
-			break;
+			$data[$field] = $modelData[$field];
 		}
 	}
 
@@ -325,20 +332,21 @@ function db_create_model(string $modelTable, array $modelFields, array $modelDat
 }
 
 /**
- * @param $data
- * @param string $type
- * @return bool
+ * Vérifie le type des données avant leur insertion ou mise à jour dans la base de données.
+ * @param mixed $data La donnée à vérifier.
+ * @param string $type Le type attendu de la donnée ('int' ou 'string').
+ * @return bool True si la donnée correspond au type attendu, False sinon.
  */
-function db_verify_data($data, string $type): bool
+function db_verify_data(mixed $data, string $type): bool
 {
 	switch ($type)
 	{
 		case 'int':
-			return is_int($data);
+			return is_int($data) || ctype_digit($data);
 		case 'string':
 			return is_string($data);
 		default:
-			log_file("Value type is not compatible or not yet implemented.");
+			log_file("Type de donnée non compatible ou non implémenté : $type.");
 			return false;
 	}
 }
