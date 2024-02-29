@@ -2,7 +2,7 @@
     "private": true,
     "scripts": {
         "dev": "npx tailwindcss -i ./resources/css/app.css -o ./public/build/app.css --watch",
-        "build": "npx tailwindcss -i ./resources/css/app.css -o ./public/build/app.css"
+        "build": "npx tailwindcss -i ./resources/css/app.css -o ./public/build/app.css --minify"
     },
     "devDependencies": {
         "tailwindcss": "^3.4.1"

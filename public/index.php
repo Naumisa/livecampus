@@ -11,7 +11,7 @@
 		<title><?= lang_get('title'), ' - ', lang_get("navigation." . routes_get_route()) ?></title>
 		<link rel="icon" type="image/png" href="<?= app_get_path('public_storage') ?>images/favicon.png" />
 		<?php if (file_exists('./build/app.css')): ?>
-			<link href="./build/app.css" rel="stylesheet" />
+			<link href="/build/app.css" rel="stylesheet" />
 		<?php else: ?>
 			<script src="https://cdn.tailwindcss.com"></script>
 			<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
