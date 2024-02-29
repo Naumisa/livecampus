@@ -121,7 +121,7 @@ function user_update(int $id, array $data): void
  */
 function user_get_data_with_id (int $id): array
 {
-	return db_fetch_data(user_get_table(), 'id', $id);
+	return db_fetch_data(user_get_table(), 'id', $id)[0];
 }
 
 /**
@@ -130,7 +130,7 @@ function user_get_data_with_id (int $id): array
  */
 function user_get_data_with_email (string $email): array
 {
-	return db_fetch_data(user_get_table(), 'email', $email);
+	return db_fetch_data(user_get_table(), 'email', $email)[0];
 }
 
 /**

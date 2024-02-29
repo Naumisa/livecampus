@@ -3,9 +3,42 @@
 /**
  * @return array
  */
-function index(): array
+function show(): array
 {
-	$data = [ 'user' => auth_user() ];
+	$data = [];
+
+	//TODO: Make a real show profile view
+	$id = routes_get_params('id');
+
+	if ($id != null)
+	{
+		$user = user_get_data_with_id((int) $id);
+
+		$data['user'] = $user;
+	}
+
+	return [
+		'data' => $data,
+		'view' => "user/profile",
+	];
+}
+
+function dashboard(): array
+{
+	$data = [];
+
+	return [
+		'data' => $data,
+		'view' => "user/dashboard",
+	];
+}
+
+/**
+ * @return array
+ */
+function profile(): array
+{
+	$data['user'] = auth_user();
 
 	return [
 		'data' => $data,
@@ -98,25 +131,30 @@ function login_attempt(): array
 
 		if ($user != null)
 		{
-			$token = user_generate_tokens();
+			if (password_verify($data['user_password'], $user['password']))
+			{
+				$token = user_generate_tokens();
 
-			user_update((int) $user[0]['id'], [ 'remember_token' => $token ]);
+				user_update((int) $user['id'], [ 'remember_token' => $token ]);
 
-			header('Location: /user/profile');
+				header('Location: /user/profile');
 
-			$_SESSION['token'] = $token;
-			$_SESSION['email'] = $user[0]['email'];
+				$_SESSION['token'] = $token;
+				$_SESSION['email'] = $user['email'];
 
-			die();
+				die();
+			}
+
+			$result['error'] = "Le mot de passe ne correspond pas.";
 		}
 		else
 		{
-			$result[] = [ 'error' => "Aucun utilisateur n'existe pour cette adresse e-mail." ];
+			$result['error'] = "Aucun utilisateur n'existe pour cette adresse e-mail.";
 		}
 	}
 	else
 	{
-		$result[] = [ 'error' => $error ];
+		$result['error'] = [ 'error' => $error ];
 	}
 
 	return [
@@ -191,6 +229,8 @@ function register_attempt(): array
 
 		if ($user == null)
 		{
+			$token = user_generate_tokens();
+
 			$username = explode('@', $data['user_email'])[0];
 			$newData = [];
 			$newData['username'] = $username;
@@ -199,16 +239,14 @@ function register_attempt(): array
 				$newData[str_replace('user_', '', $key)] = $value;
 			}
 			$newData['password'] = password_hash($newData['password'], PASSWORD_DEFAULT);
+			$newData['rememberToken'] = $token;
 
 			$user = user_create($newData);
-
-			$token = user_generate_tokens();
-
-			user_update((int) $user[0]['id'], [ 'remember_token' => $token ]);
 
 			header('Location: /user/profile');
 
 			$_SESSION['token'] = $token;
+			$_SESSION['email'] = $user['email'];
 
 			die();
 		}
@@ -225,15 +263,5 @@ function register_attempt(): array
 	return [
 		'data' => $result,
 		'view' => "user/auth/register",
-	];
-}
-
-function dashboard(): array
-{
-	$data = [];
-
-	return [
-		'data' => $data,
-		'view' => "user/auth/dashboard",
 	];
 }
