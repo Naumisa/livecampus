@@ -50,11 +50,11 @@ function index(): array
     }
 
     // Récupérer les fichiers de l'utilisateur depuis la base de données
-    $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
-    $files = file_get_by_user($userId); // Fonction pour récupérer les fichiers de l'utilisateur depuis la base de données
+   // $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
+    //$files = file_get_by_user($userId); // Fonction pour récupérer les fichiers de l'utilisateur depuis la base de données
 
     return [
-        'files' => $files,
+        //'files' => $files,
         'data' => $data,
         'view' => "file/index",
     ];

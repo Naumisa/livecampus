@@ -10,7 +10,7 @@
 /public/storage
 
 # Ignore logs files
-/storage/logs/*
+/storage/logs/*.log
 
 # Ignore local environnements datas
 /.env
