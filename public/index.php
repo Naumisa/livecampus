@@ -8,7 +8,7 @@
 <html lang="fr">
 	<head>
 		<meta charset="UTF-8">
-		<title><?= lang_get('title'), ' - ', lang_get("navigation." . routes_get_route()) ?></title>
+		<title><?= lang_get('title'), ' - ', lang_get("navigation." . routes_get_route_name()) ?></title>
 		<link rel="icon" type="image/png" href="<?= app_get_path('public_storage') ?>images/favicon.png" />
 		<?php if (file_exists('./build/app.css')): ?>
 			<link href="/build/app.css" rel="stylesheet" />
@@ -29,10 +29,10 @@
 
 		<main class="p-4 <?= isLoggedIn() ? 'md:ml-64' : 'md:mx-8' ?> h-auto pt-20">
 			<h1 class="pb-4 px-4 text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-				<?= lang_get(routes_get_route() . '.title') ?>
+				<?= lang_get(routes_get_route_name() . '.title') ?>
 			</h1>
 			<div class="p-4 border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600">
-				<?php routes_get_view(routes_get_controller()); ?>
+				<?php routes_get_view(); ?>
 			</div>
 		</main>
 

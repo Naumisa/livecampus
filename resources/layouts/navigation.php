@@ -174,7 +174,7 @@
 			<ul class="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 rounded-l md:flex-row md:space-x-8 rtl:space-x-reverse">
 				<?php foreach($loggedOutLinks as $link => $value): ?>
 					<li>
-						<a href="<?= routes_go_to_route($link) ?>" <?= routes_get_route() === $link ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
+						<a href="<?= routes_go_to_route($link) ?>" <?= routes_get_route_name() === $link ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
 							<?= lang_get($value) ?>
 						</a>
 					</li>
