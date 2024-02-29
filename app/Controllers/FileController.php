@@ -18,7 +18,7 @@ function index(): array
         } elseif ($fileSize > $maxFileSize) {
             echo "Erreur : La taille du fichier dépasse la limite de 20 Mo.";
         } else {
-            $userId = get_current_user();
+            $userId = auth_user();
             $hashedUserId = md5($userId); // Hachage de l'ID de l'utilisateur
 
             $targetDir = "storage/" . $hashedUserId . "/"; // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
@@ -43,7 +43,7 @@ function index(): array
     }
 
     // Récupérer les fichiers de l'utilisateur depuis la base de données
-    $userId = get_current_user(); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
+    $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
     $files = get_user_files($userId); // Fonction fictive pour récupérer les fichiers de l'utilisateur depuis la base de données
 
     // Afficher la liste des fichiers dans l'interface utilisateur

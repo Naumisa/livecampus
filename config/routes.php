@@ -9,8 +9,6 @@ function routes_get_navigation(): array
 	return [
 		// 'lien/lien'			=> ['Methode requise'], "Controller", 'function du Controller', '<nom de la route>', isLoggedIn()],
 
-		'' 						=> ['GET', "$path/HomeController.php", 'index', 'home'],
-		'home' 					=> ['GET', "$path/HomeController.php", 'index', 'home'],
 		'' 						=> ['GET', "$path/HomeController.php", 'index', 'home', false],
 		'home' 					=> ['GET', "$path/HomeController.php", 'index', 'home', false],
 
