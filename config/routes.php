@@ -1,7 +1,10 @@
 <?php
 
 /**
- * @return array[] Retourne la liste des routes disponibles avec leurs paramètres
+ * Retourne la liste des routes disponibles avec leurs paramètres.
+ * Chaque route est définie par son chemin, la méthode HTTP, le chemin du contrôleur,
+ * le nom de la fonction à appeler, son appellation et si l'authentification est nécessaire.
+ * @return array[] La configuration des routes.
  */
 function routes_get_navigation(): array
 {
@@ -29,31 +32,29 @@ function routes_get_navigation(): array
 }
 
 /**
- * @param string $request
- * @return bool
+ * Extrait les paramètres d'une requête et les stocke dans $_REQUEST.
+ * @param string $request La requête à analyser.
+ * @return bool Retourne true si des paramètres ont été trouvés et traités, false sinon.
  */
 function get_route_parameters(string $request): bool
 {
 	$routePaths = explode('/', $request);
-
-
 	$hasParam = false;
 	$buildRequest = "";
 	$toStore = [];
-	foreach ($routePaths as $lastPath)
+
+	foreach ($routePaths as $segment)
 	{
-		if ($lastPath[0] != ':')
+		if (str_starts_with($segment, ':'))
 		{
-			$buildRequest .= sprintf("/%s", $lastPath);
+			$hasParam = true;
+			$params = explode(';', substr($segment, 1));
+			$buildRequest .= "/{" . $params[0] . "}";
+			$toStore[$params[0]] = $params[1] ?? null;
 		}
 		else
 		{
-			$hasParam = true;
-
-			$params = explode(';', ltrim($lastPath, ':'));
-
-			$buildRequest .= sprintf("/{%s}", $params[0]);
-			$toStore[$params[0]] = $params[1];
+			$buildRequest .= "/$segment";
 		}
 	}
 
@@ -63,16 +64,16 @@ function get_route_parameters(string $request): bool
 	}
 
 	$_REQUEST['params'] = $toStore;
-	$_REQUEST['route'] = substr($buildRequest, 1);
-	var_dump($buildRequest);
+	$_REQUEST['route'] = trim($buildRequest, '/');
 
 	return true;
 }
 
 
 /**
- * @param string $key
- * @return string
+ * Redirige vers une route spécifique basée sur une clé donnée.
+ * @param string $key La clé identifiant la route cible.
+ * @return string L'URL de redirection.
  */
 function routes_go_to_route(string $key): string
 {
@@ -99,7 +100,8 @@ function routes_go_to_route(string $key): string
 }
 
 /**
- * @return string
+ * Récupère le chemin de la page actuelle à partir de l'URL.
+ * @return string Le chemin de la page actuelle.
  */
 function routes_get_page(): string
 {
@@ -109,9 +111,12 @@ function routes_get_page(): string
 }
 
 /**
- * @return string
+ * Détermine la route actuelle en se basant sur l'URL demandée.
+ * Si des paramètres sont présents dans l'URL, ils sont traités et stockés.
+ * @param string|null $request L'URL demandée, ou null pour utiliser l'URL actuelle.
+ * @return array La configuration de la route correspondante.
  */
-function routes_get_route($request = null): array
+function routes_get_route(string $request = null): array
 {
 	if ($request == null)
 	{
@@ -134,21 +139,25 @@ function routes_get_route($request = null): array
 }
 
 /**
- * @return string
+ * Récupère le nom de la route actuelle.
+ *
+ * @return string Le nom de la route.
  */
 function routes_get_route_name(): string
 { return routes_get_route()[3]; }
 
 /**
- * @param string $key
- * @return string|null
+ * Récupère un paramètre spécifique de la requête actuelle.
+ *
+ * @param string $key La clé du paramètre à récupérer.
+ * @return string|null La valeur du paramètre, ou null si non trouvé.
  */
 function routes_get_params (string $key): ?string
-{
-	return $_REQUEST['params'][$key] != null ? $_REQUEST['params'][$key] : null;
-}
+{ return $_REQUEST['params'][$key] ?? null; }
 
 /**
+ * Charge la vue correspondante à la route actuelle.
+ * Gère l'authentification requise pour certaines routes et les erreurs de méthode HTTP.
  * @return void
  */
 function routes_get_view(): void
