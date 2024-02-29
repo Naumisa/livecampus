@@ -78,3 +78,32 @@ function file_get_by_user(int $userId): array
     $files = db_select(file_get_table(), $conditions);
     return $files ?: [];
 }
+
+// Fonction pour exécuter une requête de sélection dans la base de données
+function db_select(string $table, array $conditions = []): array
+{
+    // Connexion à la base de données (à remplacer par votre propre méthode de connexion)
+    $pdo = new PDO("mysql:host=localhost;livecampus", "root", "");
+
+    // Construction de la requête SQL
+    $query = "SELECT * FROM $table";
+    $params = [];
+    if (!empty($conditions)) {
+        $query .= " WHERE ";
+        $conditions_array = [];
+        foreach ($conditions as $key => $value) {
+            $conditions_array[] = "$key = :$key";
+            $params[":$key"] = $value;
+        }
+        $query .= implode(" AND ", $conditions_array);
+    }
+
+    // Préparation et exécution de la requête
+    $statement = $pdo->prepare($query);
+    $statement->execute($params);
+
+    // Récupération des résultats
+    $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    return $results;
+}

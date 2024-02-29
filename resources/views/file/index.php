@@ -3,7 +3,7 @@
 
     <!-- Formulaire pour ajouter un nouveau fichier -->
     <h3>Ajouter un nouveau fichier :</h3>
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="index.php" method="post" enctype="multipart/form-data">
         <input type="file" name="fileToUpload">
         <input type="submit" value="Ajouter" name="ajouter">
     </form>
