@@ -1,11 +1,14 @@
 <?php
 /**
- * @return array
+ * Fonction de contrôleur pour gérer l'index de la page des fichiers.
+ *
+ * @return array Données et vue à afficher.
  */
 function index(): array
 {
     $data = [];
 
+    // Traitement du formulaire pour l'ajout de fichiers
     if(isset($_POST['ajouter'])){
         $allowedExtensions = array("jpg", "jpeg", "png", "gif"); // Extensions autorisées
         $maxFileSize = 20 * 1024 * 1024; // Taille maximale autorisée (20 Mo)
@@ -36,6 +39,10 @@ function index(): array
 
             if(move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $newTargetFile)) {
                 echo "Le fichier a été téléchargé avec succès.";
+
+                // Insérer les informations du fichier dans la base de données
+                $name_origine = $_FILES["fileToUpload"]["name"];
+                file_insert($name_origine, $newFileName, 0); // Le compteur de téléchargement est initialement défini sur 0
             } else {
                 echo "Erreur lors du téléchargement du fichier.";
             }
@@ -44,23 +51,11 @@ function index(): array
 
     // Récupérer les fichiers de l'utilisateur depuis la base de données
     $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
-    $files = get_user_files($userId); // Fonction fictive pour récupérer les fichiers de l'utilisateur depuis la base de données
-
-    // Afficher la liste des fichiers dans l'interface utilisateur
-    if (!empty($files)) {
-        echo "<h3>Liste de vos fichiers précédemment envoyés :</h3>";
-        echo "<ul>";
-        foreach ($files as $file) {
-            echo "<li><a href='download.php?file_id={$file['id']}'>{$file['filename']}</a></li>";
-        }
-        echo "</ul>";
-    } else {
-        echo "Aucun fichier n'a été envoyé précédemment.";
-    }
+    $files = file_get_by_user($userId); // Fonction pour récupérer les fichiers de l'utilisateur depuis la base de données
 
     return [
+        'files' => $files,
         'data' => $data,
         'view' => "file/index",
     ];
 }
-?>

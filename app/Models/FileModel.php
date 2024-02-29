@@ -62,3 +62,19 @@ function file_delete(int $id): void
         log_file("Attempted to delete file.");
     }
 }
+
+function file_insert(int $userId, string $name_origine, string $name_random): void
+{
+    $data = file_get_data_array(0, $name_origine, $name_random, 0);
+    $data['user_id'] = $userId;
+    if (!db_insert(file_get_table(), $data)) {
+        log_file("Failed to insert file into database.");
+    }
+}
+
+function file_get_by_user(int $userId): array
+{
+    $conditions = ['user_id' => $userId];
+    $files = db_select(file_get_table(), $conditions);
+    return $files ?: [];
+}
