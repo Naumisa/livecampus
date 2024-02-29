@@ -77,6 +77,23 @@ function upload(): array
     return [
         //'files' => $files,
         'data' => $data,
-        'view' => "file/index",
+        'view' => "user/dashboard",
     ];
+}
+
+/**
+ * @return array
+ */
+function delete(): array
+{
+	$fileId = get_route_parameters('id'); // Récupère l'ID du fichier dont la suppression a été demandée
+
+	// doit vérifier si le fichier appartient bien à l'utilisateur connecté
+
+	$data = [];
+
+	return [
+		'data' => $data,
+		'view' => "user/dashboard",
+	];
 }
