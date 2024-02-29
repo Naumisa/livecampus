@@ -1,1 +1,4 @@
-test
+function hello()
+{
+	console.log("hello !");
+}

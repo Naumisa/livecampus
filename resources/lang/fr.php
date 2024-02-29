@@ -28,6 +28,9 @@ return [
 	'navigation.profile' => 'Mon compte',
 	'navigation.logout' => 'Se déconnecter',
 
+	// Navigation: admin
+	'navigation.users' => 'Admin > Utilisateurs',
+
 	// Page d'accueil
 	'home.title' => 'Accueil',
 
@@ -40,8 +43,34 @@ return [
 	// Page de Contact
 	'contact.title' => 'Nous contacter',
 
+	// Page de Tableau de bord
+	'dashboard.title' => 'Tableau de bord',
+	'dashboard.file_upload' => 'Téléverser un fichier',
+	'dashboard.files_count' => 'Total de fichiers',
+	'dashboard.total_size' => 'Taille sur stockage',
+	'dashboard.showing' => 'Affichage',
+	'dashboard.showing_of' => 'sur',
+
 	// Page de Téléversement
 	'file.title' => 'Téléverser',
+
+	'file_info.title' => 'Informations du fichier',
+	'file_info.name' => 'Nom',
+	'file_info.type' => 'Type',
+	'file_info.size' => 'Taille',
+	'file_info.owner' => 'Propriétaire',
+	'file_info.downloaded_count' => 'Téléchargé',
+	'file_info.count' => 'fois',
+	'file_info.last_updated' => 'Dernière mise à jour',
+	'file_info.actions' => 'Actions',
+	'file_info.action_share' => 'Partager',
+	'file_info.action_delete' => 'Supprimer',
+
+	'file_upload.action_description' => 'Cliquez ou Glissez-Déposez pour téléverser',
+	'file_upload.upload_types' => 'Non acceptés: { .php }',
+	'file_upload.upload_max_size' => 'Taille maximum: 20 Mo',
+	'file_upload.send' => 'Envoyer',
+	'file_upload.cancel' => 'Annuler',
 
 	// Page de Connexion
 	'login.title' => 'Connexion',

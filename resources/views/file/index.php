@@ -1,5 +1,4 @@
-<section id="login">
-    <h2><?= lang_get('file.title') ?></h2>
+<section id="file">
     <img src="<?= app_get_path('public_storage') ?>images/home.jpg"  alt=""/>
 
     <!-- Affichage de la liste des fichiers précédemment envoyés -->

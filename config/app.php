@@ -50,11 +50,11 @@ function app_get_environment(): void
 app_get_environment();
 
 $configs = [
+	'database',
+	'auth',
 	'routes',
 	'languages',
-	'auth',
 	'logging',
-	'database',
 ];
 
 foreach ($configs as $config)
@@ -73,3 +73,20 @@ if (count(user_get_data_with_email('admin@email.com')) == 0)
 	user_create(user_get_data_array("admin", "admin@email.com", "password", 1));
 }
 // END-TODO
+
+$loggedOutLinks = [
+	'home' => 'navigation.home',
+	'services' => 'navigation.services',
+	'contact' => 'navigation.contact',
+	'login' => 'navigation.login',
+	'register' => 'navigation.register',
+];
+
+$loggedLinks = [
+	'dashboard' => 'navigation.dashboard',
+	'file' => 'navigation.file',
+];
+
+$adminLinks = [
+	'users' => 'navigation.users',
+];

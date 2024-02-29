@@ -134,37 +134,13 @@ function user_get_data_with_email (string $email): array
 }
 
 /**
- * @param string $token
- * @return array
- */
-function user_get_data_with_token (string $token): array
-{
-	return db_fetch_data(user_get_table(), 'remember_token', $token);
-}
-
-/**
- * @return array|null
- */
-function user_get_actual (): ?array
-{
-	if (isset($_SESSION['token']))
-	{
-		return user_get_data_with_token($_SESSION['token'])[0];
-	}
-	else
-	{
-		return null;
-	}
-}
-
-/**
  * @param int $id
  * @param string $password
  * @return bool
  */
 function user_confirm_password (int $id, string $password): bool
 {
-	$user = user_get_actual();
+	$user = auth_user();
 	return password_verify($password, $user['password']);
 }
 

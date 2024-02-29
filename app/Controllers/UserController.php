@@ -5,7 +5,7 @@
  */
 function index(): array
 {
-	$data = [ 'user' => user_get_actual() ];
+	$data = [ 'user' => auth_user() ];
 
 	return [
 		'data' => $data,
@@ -58,6 +58,7 @@ function login_attempt(): array
 			header('Location: /user/profile');
 
 			$_SESSION['token'] = $token;
+			$_SESSION['email'] = $user[0]['email'];
 
 			die();
 		}
@@ -84,10 +85,11 @@ function logout(): array
 {
 	$newData = [ 'remember_token' => null ];
 
-	$user = user_get_actual();
+	$user = auth_user();
 	user_update($user['id'], $newData);
 
 	unset($_SESSION['token']);
+	unset($_SESSION['email']);
 
 	$data = [];
 

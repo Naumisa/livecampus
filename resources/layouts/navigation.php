@@ -1,32 +1,16 @@
 <?php
 	$navigation_linkClass = [
 		// Active page
-		"block py-2 px-3 text-white bg-gray-700 rounded md:bg-transparent md:text-red-700 md:p-0
+		"block px-3 text-white  rounded md:bg-transparent md:text-red-700 md:p-0
 		dark:text-white md:dark:text-white",
         // Inactive page
-		"block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-red-800 md:p-0
-		dark:text-gray-300 md:dark:hover:text-red-500 dark:hover:bg-gray-700 dark:hover:text-gray-900 md:dark:hover:bg-transparent",
+		"block px-3 text-gray-900 rounded md:hover:bg-transparent md:hover:text-red-800 md:p-0
+		dark:text-gray-300 md:dark:hover:text-red-500 dark:hover:text-gray-900",
 	];
-
-	$loggedLinks = [
-		'dashboard' => 'navigation.dashboard',
-		'file' => 'navigation.file',
-		'profile' => 'navigation.profile',
-	];
-	$unLoggedLinks = [
-		'home' => 'navigation.home',
-		'services' => 'navigation.services',
-		'contact' => 'navigation.contact',
-		'login' => 'navigation.login',
-		'register' => 'navigation.register',
-	];
-
-	// TODO: Temp variable declaration
-	global $isLoggedIn;
 ?>
 
-<?php if ($isLoggedIn): ?>
-<nav class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 left-0 right-0 top-0 z-50">
+<nav class="bg-red-600 border-b border-red-800 px-4 py-2.5 dark:bg-red-800 dark:border-red-400 fixed left-0 right-0 top-0 z-50">
+	<?php if (isLoggedIn()): ?>
 	<div class="flex flex-wrap justify-between items-center">
 		<div class="flex justify-start items-center">
 			<button data-drawer-target="drawer-navigation"
@@ -53,29 +37,9 @@
 				</svg>
 				<span class="sr-only">Toggle sidebar</span>
 			</button>
-			<a href="<?= routes_go_to_route('home') ?>" class="flex items-center justify-between mr-4">
+			<a href="<?= routes_go_to_route('dashboard') ?>" class="flex items-center justify-between mr-4">
 				<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"><?= lang_get('title') ?></span>
 			</a>
-			<form action="#" method="GET" class="hidden md:block md:pl-2">
-				<label for="topbar-search" class="sr-only">Search</label>
-				<div class="relative md:w-64 md:w-96">
-					<div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-						<svg class="w-5 h-5 text-gray-500 dark:text-gray-400"
-							 fill="currentColor"
-							 viewBox="0 0 20 20"
-							 xmlns="http://www.w3.org/2000/svg">
-							<path fill-rule="evenodd"
-								  clip-rule="evenodd"
-								  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"></path>
-						</svg>
-					</div>
-					<input type="text"
-						   name="email"
-						   id="topbar-search"
-						   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-						   placeholder="Search" />
-				</div>
-			</form>
 		</div>
 		<div class="flex items-center lg:order-2">
 			<button type="button"
@@ -102,7 +66,7 @@
 				</svg>
 			</button>
 			<!-- Dropdown menu -->
-			<div class="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700 rounded-xl"
+			<div class="hidden overflow-hidden z-50 my-4 max-w-sm text-base list-none bg-white rounded divide-y divide-gray-100 shadow-lg dark:divide-gray-600 dark:bg-gray-700"
 				 id="notification-dropdown">
 				<div class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-600 dark:text-gray-300">
 					Notifications
@@ -168,11 +132,11 @@
 				/>
 			</button>
 			<!-- Dropdown menu -->
-			<div class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600 rounded-xl"
+			<div class="hidden z-50 my-4 w-56 text-base list-none bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
 				 id="dropdown">
 				<div class="py-3 px-4">
-					<span class="block text-sm font-semibold text-gray-900 dark:text-white"><?= user_get_actual()['username'] ?></span>
-					<span class="block text-sm text-gray-900 truncate dark:text-white"><?= user_get_actual()['email'] ?></span>
+					<span class="block text-sm font-semibold text-gray-900 dark:text-white"><?= auth_user()['username'] ?></span>
+					<span class="block text-sm text-gray-900 truncate dark:text-white"><?= auth_user()['email'] ?></span>
 				</div>
 				<ul class="py-1 text-gray-700 dark:text-gray-300"
 					aria-labelledby="dropdown">
@@ -195,11 +159,9 @@
 			</div>
 		</div>
 	</div>
-</nav>
 <?php else: ?>
-<nav class="bg-gray-300 border-red-200 dark:bg-red-900">
-	<div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-		<a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+	<div class="max-w-screen-xl flex flex-wrap justify-between items-center mx-auto">
+		<a href="<?= routes_go_to_route('home') ?>" class="flex items-center justify-between mr-4">
 			<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"><?= lang_get('title') ?></span>
 		</a>
 		<button data-collapse-toggle="navbar" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar" aria-expanded="false">
@@ -209,55 +171,16 @@
 			</svg>
 		</button>
 		<div class="hidden w-full md:block md:w-auto" id="navbar">
-			<ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-300 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 dark:bg-gray-800 md:dark:bg-red-900 dark:border-gray-700">
-				<?php if ($isLoggedIn): ?>
-					<form action="#" method="GET" class="hidden md:block md:pl-2">
-						<label for="topbar-search" class="sr-only">Search</label>
-						<div class="relative md:w-64 md:w-96">
-							<div
-									class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none"
-							>
-								<svg
-										class="w-5 h-5 text-gray-500 dark:text-gray-400"
-										fill="currentColor"
-										viewBox="0 0 20 20"
-										xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-											fill-rule="evenodd"
-											clip-rule="evenodd"
-											d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-									></path>
-								</svg>
-							</div>
-							<input
-									type="text"
-									name="email"
-									id="topbar-search"
-									class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-									placeholder="Search"
-							/>
-						</div>
-					</form>
-					<?php foreach($loggedLinks as $link => $value): ?>
-						<li>
-							<a href="<?= routes_go_to_route($link) ?>" <?= routes_get_route() === $link ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
-								<?= lang_get($value) ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
-
-                <?php else: ?>
-					<?php foreach($unLoggedLinks as $link => $value): ?>
-						<li>
-							<a href="<?= routes_go_to_route($link) ?>" <?= routes_get_route() === $link ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
-								<?= lang_get($value) ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				<?php endif; ?>
+			<ul class="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 rounded-l md:flex-row md:space-x-8 rtl:space-x-reverse">
+				<?php foreach($loggedOutLinks as $link => $value): ?>
+					<li>
+						<a href="<?= routes_go_to_route($link) ?>" <?= routes_get_route() === $link ? "class='$navigation_linkClass[0]' aria-current=\"page\"" : "class='$navigation_linkClass[1]'" ?>>
+							<?= lang_get($value) ?>
+						</a>
+					</li>
+				<?php endforeach; ?>
 			</ul>
 		</div>
 	</div>
-</nav>
 <?php endif; ?>
+</nav>

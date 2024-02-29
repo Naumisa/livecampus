@@ -7,24 +7,26 @@ function routes_get_navigation(): array
 {
 	$path = app_get_path('controllers');
 	return [
-		// 'lien/lien'			=> ['Methode requise'], "Controller", 'function du Controller', '<nom de la route>'],
+		// 'lien/lien'			=> ['Methode requise'], "Controller", 'function du Controller', '<nom de la route>', isLoggedIn()],
 
 		'' 						=> ['GET', "$path/HomeController.php", 'index', 'home'],
 		'home' 					=> ['GET', "$path/HomeController.php", 'index', 'home'],
+		'' 						=> ['GET', "$path/HomeController.php", 'index', 'home', false],
+		'home' 					=> ['GET', "$path/HomeController.php", 'index', 'home', false],
 
-		'services' 				=> ['GET', "$path/ServicesController.php", 'index', 'services'],
+		'services' 				=> ['GET', "$path/ServicesController.php", 'index', 'services', false],
 
-		'contact' 				=> ['GET', "$path/ContactController.php", 'index', 'contact'],
+		'contact' 				=> ['GET', "$path/ContactController.php", 'index', 'contact', false],
 
-		'user/profile' 			=> ['GET', "$path/UserController.php", 'index', 'profile'],
-		'user/dashboard' 		=> ['GET', "$path/UserController.php", 'dashboard', 'dashboard'],
-		'user/login' 			=> ['GET', "$path/UserController.php", 'login', 'login'],
-		'user/login/confirm' 	=> ['POST', "$path/UserController.php", 'login_attempt', "login.confirmation"],
-		'user/register' 		=> ['GET', "$path/UserController.php", 'register', 'register'],
-		'user/register/confirm' => ['POST', "$path/UserController.php", 'register_attempt', 'register.confirmation'],
-		'user/logout' 			=> ['GET', "$path/UserController.php", 'logout', 'logout'],
+		'user/profile' 			=> ['GET', "$path/UserController.php", 'index', 'profile', true],
+		'user/dashboard' 		=> ['GET', "$path/UserController.php", 'dashboard', 'dashboard', true],
+		'user/login' 			=> ['GET', "$path/UserController.php", 'login', 'login', false],
+		'user/login/confirm' 	=> ['POST', "$path/UserController.php", 'login_attempt', 'login.confirmation', false],
+		'user/register' 		=> ['GET', "$path/UserController.php", 'register', 'register', false],
+		'user/register/confirm' => ['POST', "$path/UserController.php", 'register_attempt', 'register.confirmation', false],
+		'user/logout' 			=> ['GET', "$path/UserController.php", 'logout', 'logout', true],
 
-        'file' 					=> ['GET', "$path/FileController.php", 'index', 'file'],
+        'file' 					=> ['GET', "$path/FileController.php", 'index', 'file', true],
 	];
 }
 
@@ -39,10 +41,21 @@ function routes_go_to_route(string $key): string
 	{
 		if ($values[3] === $key)
 		{
-			return "/$route";
+			if ($values[4] && isLoggedIn() || !$values[4] && !isLoggedIn())
+			{
+				return "/$route";
+			}
 		}
 	}
-	return '/';
+
+	if (isLoggedIn())
+	{
+		return '/dashboard';
+	}
+	else
+	{
+		return '/home';
+	}
 }
 
 /**
@@ -85,11 +98,22 @@ function routes_get_controller(): array
 	{
 		log_file("/" . routes_get_page() . " was attempted to be loaded but Controller doesn't exist.");
 		// Redirige vers la page d'accueil dans le cas où la page souhaitée n'existe pas.
-		header("Location: /");
-		die();
+		return $routes['home'];
 	}
 
-	return $routes[routes_get_page()];
+	if ($routes[routes_get_page()][4] && isLoggedIn() || !$routes[routes_get_page()][4] && !isLoggedIn())
+	{
+		return $routes[routes_get_page()];
+	}
+
+	if (isLoggedIn())
+	{
+		return $routes['user/dashboard'];
+	}
+	else
+	{
+		return $routes['home'];
+	}
 }
 
 /**
@@ -100,13 +124,13 @@ function routes_get_view(array $controller): void
 {
 	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $controller[0];
 
+	include_once ($controller[1]);
+
 	if (!$isGoodRequest)
 	{
-		header('Location: /');
+		on_error();
 		die();
 	}
-
-	include_once ($controller[1]);
 
 	$functionName = $controller[2];
 

@@ -20,7 +20,7 @@ npm install
 2 - Génération du fichier de styles nécessaire à l'affichage de nos pages
 
 ```bash
-npx tailwindcss -i ./resources/css/app.css -o ./public/build/app.css
+npm run build
 ```
 
 3 - Génération des liens symboliques requis

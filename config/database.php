@@ -234,6 +234,41 @@ function db_update(string $table, int $id, array $data): bool
 	return true;
 }
 
+function db_delete(string $table, int $id): bool
+{
+	$db = db_connect();
+
+	if ($db == null)
+	{
+		return false;
+	}
+
+	if (db_fetch_data($table, 'id', $id) != null)
+	{
+		$query = "DELETE FROM :table WHERE id = :id";
+		$result = $db->prepare($query);
+
+		try {
+			$result->execute([
+				'table' => $table,
+				'id' => $id,
+			]);
+		}
+		catch (PDOException $e)
+		{
+			log_file("Erreur de suppression: " . $e->getMessage());
+			return false;
+		}
+	}
+	else
+	{
+		log_file("Tentative de suppression dans $table de l'id $id mais l'objet n'existe pas.");
+		return false;
+	}
+
+	return true;
+}
+
 /**
  * @param string $modelTable
  * @param array $modelFields

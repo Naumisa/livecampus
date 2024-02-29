@@ -27,13 +27,13 @@ function file_get_fields(): array
         ],
         'download_count' => [
             'type' => 'int',
-            'required' => true,
+            'required' => false,
             'unique' => false,
-            'query' => 'INT',
+            'query' => 'INT DEFAULT 0',
         ],
         'created_at' => [
             'type' => 'timestamp',
-            'required' => true,
+            'required' => false,
             'unique' => false,
             'query' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
         ],
