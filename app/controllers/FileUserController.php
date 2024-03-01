@@ -43,15 +43,10 @@ function addUserToConsult(): array
  */
 function addUserDownload(): array
 {
-    // recupere l'id de l'utilisateur en cours
     $user = auth_user();
-    // recupere tous les fichiers de partage ou l'utilisateur est inscrit
-    $filesUsers = new FileUserModel;
-    $filesUsers->where('user_id', $user->id);
+    $data['files'] = $user->sharedFiles();
+    $data['user_storage_path'] = $user->storage_path();
 
-    $data = [];
-    $data['files'] = $filesUsers;
-    //var_dump($data['files']);
     return [
         'data' => $data,
         'view' => "user/dashboard",

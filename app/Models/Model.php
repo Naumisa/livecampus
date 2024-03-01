@@ -13,12 +13,12 @@ abstract class Model
 	protected array $foreign_fields = [];
 
 	public int $id = 0;
-	protected string $created_at = '';
-	protected string $updated_at = '';
+	public string $created_at = '';
+	public string $updated_at = '';
 
 	private int $state = 0;
 
-	private array $query = [];
+	public array $query = [];
 
 	public function migrate(): void
 	{
@@ -91,8 +91,7 @@ abstract class Model
 	{
 		$this->where($column, $value);
 
-		if (empty($this->query))
-		{
+		if (empty($this->query)) {
 			return null;
 		}
 
@@ -117,8 +116,7 @@ abstract class Model
 
 	public function parse_in_model(array $data): Model
 	{
-		foreach ($data as $field => $value)
-		{
+		foreach ($data as $field => $value) {
 			$this->$field = $value;
 		}
 

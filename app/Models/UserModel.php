@@ -106,24 +106,38 @@ class UserModel extends Model
 		$this->remember_token = $selector . ':' . $validator;
 	}
 
-    /**
-     * @return string Returns the storage path of the user's files.
-     */
-    function storage_path(): string
-    {
-        global $root;
-        return $root . app_get_path('public_storage') . "uploads/" . md5($this->email) . "/";
-    }
+	/**
+	 * @return string Returns the storage path of the user's files.
+	 */
+	function storage_path(): string
+	{
+		global $root;
+		return $root . app_get_path('public_storage') . "uploads/" . md5($this->email) . "/";
+	}
 
-    /**
-     * @return array Returns the informations of the user's files.
-     */
-    function files() : array
-    {
-        return db_fetch_data(
-            'files',
-            'owner_id',
-            $this->id
-        );
-    }
+	/**
+	 * @return array Returns the informations of the user's files.
+	 */
+	function files(): ?FileModel
+	{
+		$files = new FileModel;
+		if ($files->where('owner_id', $this->id) > 0) {
+			return $files;
+		}
+		return null;
+	}
+	function sharedFiles(): ?FileUserModel
+	{
+		$filesUsers = new FileUserModel;
+		if ($filesUsers->where('user_id', $this->id) > 0) {
+			$data = [];
+			foreach ($filesUsers->query as $ownerId => $fileId) {
+				$file = new FileModel;
+				$file->find($fileId);
+				//$data[]= ;
+			}
+			return $filesUsers;
+		}
+		return null;
+	}
 }
