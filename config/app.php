@@ -78,10 +78,10 @@ if ($auto_user->find(1) == null) {
 }
 
 $auto_file = new FileModel;
-$auto_file->migrate();
+//$auto_file->migrate();
 
 $auto_fileUser = new FileUserModel;
-$auto_fileUser->migrate();
+//$auto_fileUser->migrate();
 
 include_once(app_get_path('models') . "FileModel.php");
 
@@ -91,17 +91,19 @@ include_once(app_get_path('models') . "FileModel.php");
 // Initialisation du système de liens de navigation selon le statut d'authentification
 $loggedOutLinks = [
 	'home' => 'navigation.home',
-	'services' => 'navigation.services',
-	'contact' => 'navigation.contact',
+	//'services' => 'navigation.services',
+	//'contact' => 'navigation.contact',
 	'login' => 'navigation.login',
 	'register' => 'navigation.register',
 ];
 
 $loggedLinks = [
 	'dashboard' => 'navigation.dashboard',
-	'file' => 'navigation.file',
+	'files.shared' => 'navigation.files_shared',
 ];
 
 $adminLinks = [
-	'users' => 'navigation.users',
+	'show-users' => 'navigation.users',
 ];
+
+ob_start();

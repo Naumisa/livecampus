@@ -8,28 +8,29 @@
  */
 function routes_get_navigation(): array
 {
-	$path = app_get_path('controllers');
 	return [
-		'home' 					=> ['GET', "$path/HomeController.php", 'index', 'home', false],
+		'home' 						=> ['GET', 	"HomeController@index", 				'home', 					0],
 
-		'services' 				=> ['GET', "$path/ServicesController.php", 'index', 'services', false],
+		//'services' 				=> ['GET', 	"$path/ServicesController@index", 		'services', 				0],
+		//'contact' 				=> ['GET', 	"$path/ContactController@index", 		'contact', 					0],
 
-		'contact' 				=> ['GET', "$path/ContactController.php", 'index', 'contact', false],
+		'user/login' 				=> ['GET', 	"UserController@login", 				'login', 					0],
+		'user/login/confirm' 		=> ['POST', "UserController@login_attempt", 		'login.confirmation', 		0],
+		'user/register' 			=> ['GET', 	"UserController@register", 				'register', 				0],
+		'user/register/confirm' 	=> ['POST', "UserController@register_attempt", 		'register.confirmation', 	0],
 
-		'user/{id}'				=> ['GET', "$path/UserController.php", 'show', 'show-user', true],
-		'user/profile' 			=> ['GET', "$path/UserController.php", 'profile', 'profile', true],
-		'user/dashboard' 		=> ['GET', "$path/UserController.php", 'dashboard', 'dashboard', true],
-		'user/login' 			=> ['GET', "$path/UserController.php", 'login', 'login', false],
-		'user/login/confirm' 	=> ['POST', "$path/UserController.php", 'login_attempt', 'login.confirmation', false],
-		'user/register' 		=> ['GET', "$path/UserController.php", 'register', 'register', false],
-		'user/register/confirm' => ['POST', "$path/UserController.php", 'register_attempt', 'register.confirmation', false],
-		'user/logout' 			=> ['GET', "$path/UserController.php", 'logout', 'logout', true],
-		'user/edit'             => ['POST', "$path/UserController.php", 'edit', 'profile.edit', true],
+		'user/profile' 				=> ['GET', 	"UserController@profile", 				'profile', 					1],
+		'user/dashboard' 			=> ['GET', 	"UserController@dashboard", 			'dashboard', 				1],
+		'user/logout' 				=> ['GET', 	"UserController@logout", 				'logout', 					1],
+		'user/edit'             	=> ['POST', "UserController@edit", 					'profile.edit', 			1],
 
-		'file/upload' 			=> ['POST', "$path/FileController.php", 'upload', 'file.upload', true],
-		'file/delete/{id}' 		=> ['GET', "$path/FileController.php", 'delete', 'file.delete', true],
-		'file/share/{id}/{email}' => ['GET', "$path/FileUserController.php", 'addUserToConsult', 'file.share', true],
-		'file/shared' => ['GET', "$path/FileUserController.php", 'addUserDownload', 'file.shared', true],
+		'files/upload' 				=> ['POST', "FileController@upload", 				'file.upload', 				1],
+		'files/delete/{id}' 		=> ['GET', 	"FileController@delete", 				'file.delete', 				1],
+		'files/share/{id}/{email}' 	=> ['GET', 	"FileUserController@addUserToConsult", 	'file.share', 				1],
+		'files/shared' 				=> ['GET', 	"FileUserController@addUserDownload", 	'files.shared', 			1],
+
+		'admin/users'				=> ['GET', 	"UserController@show", 					'show-users', 				2],
+		'admin/user/{id}'			=> ['GET', 	"UserController@show", 					'show-user', 				2],
 	];
 }
 
@@ -75,9 +76,10 @@ function get_route_parameters(string $request): bool
 function routes_go_to_route(string $key): string
 {
 	$routes = routes_get_navigation();
+	$user = auth_user();
 	foreach ($routes as $route => $values) {
-		if ($values[3] === $key) {
-			if ($values[4] && isLoggedIn() || !$values[4] && !isLoggedIn()) {
+		if ($values[2] === $key) {
+			if (isLoggedIn() && $user->role >= $values[3] - 1 || !isLoggedIn() && $values[3] === 0 ) {
 				return "/$route";
 			}
 		}
@@ -133,7 +135,7 @@ function routes_get_route(string $request = null): array
  */
 function routes_get_route_name(): string
 {
-	return routes_get_route()[3];
+	return routes_get_route()[2];
 }
 
 /**
@@ -156,29 +158,29 @@ function routes_get_view(): void
 {
 	$route = routes_get_route();
 	$method = $route[0];
-	$controller = $route[1];
-	$function = $route[2];
-	$route_name = $route[3];
-	$needAuth = $route[4];
+	$controller = explode('@', $route[1]);
+	$route_name = $route[2];
+	$authLevel = $route[3];
+	$user = auth_user();
 
 	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $method;
 
 	if (!$isGoodRequest) {
-		on_error();
+		log_file("Erreur dans la récupération des informations de la route demandée : l'utilisateur n'a pas les accès requis.");
 		die();
 	}
 
-	if ($needAuth && !isLoggedIn()) {
+	if (!isLoggedIn() && $authLevel !== 0) {
 		$route = routes_get_route('home');
-		$controller = $route[1];
-		$function = $route[2];
-		$route_name = $route[3];
+		$controller = explode('@', $route[1]);
+		$route_name = $route[2];
 	}
 
-	include_once($controller);
+	$path = app_get_path('controllers');
+	include_once("$path/$controller[0].php");
 
-	if (function_exists($function)) {
-		$result = $function(app_get_path('views'));
+	if (function_exists($controller[1])) {
+		$result = $controller[1](app_get_path('views'));
 		$file = app_get_path('views') . '/' . $result['view'] . '.php';
 
 		if (isset($result['view']) && file_exists($file)) {
@@ -188,6 +190,8 @@ function routes_get_view(): void
 			log_file("View file " . $result['view'] . " not found.");
 		}
 	} else {
-		log_file("Function $function not found.");
+		log_file("Function $controller[1] not found.");
 	}
+
+	ob_end_flush();
 }
