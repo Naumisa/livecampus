@@ -1,6 +1,7 @@
 <?php
 
 use app\Models\FileModel;
+use app\Models\FileUserModel;
 use app\Models\UserModel;
 
 /**
@@ -8,7 +9,7 @@ use app\Models\UserModel;
  * @param string $key Clé identifiant le chemin d'accès souhaité.
  * @return string Le chemin d'accès correspondant à la clé.
  */
-function app_get_path (string $key): string
+function app_get_path(string $key): string
 {
 	$paths = [
 		'resources' 		=> '../resources/',
@@ -63,17 +64,15 @@ $configs = [
 	'logging',
 ];
 
-foreach ($configs as $config)
-{
-	require_once ("../config/$config.php");
+foreach ($configs as $config) {
+	require_once("../config/$config.php");
 }
 
 // Création automatique de la table et d'un utilisateur admin.
 $auto_user = new UserModel;
 $auto_user->migrate();
 
-if ($auto_user->find(1) == null)
-{
+if ($auto_user->find(1) == null) {
 	$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
 	$auto_user->create($userArray);
 }
@@ -81,7 +80,10 @@ if ($auto_user->find(1) == null)
 $auto_file = new FileModel;
 $auto_file->migrate();
 
-include_once (app_get_path('models') . "FileModel.php");
+$auto_fileUser = new FileUserModel;
+$auto_fileUser->migrate();
+
+include_once(app_get_path('models') . "FileModel.php");
 
 //file_migrate();
 // END-TODO

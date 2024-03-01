@@ -28,6 +28,8 @@ function routes_get_navigation(): array
 
 		'file/upload' 			=> ['POST', "$path/FileController.php", 'upload', 'file.upload', true],
 		'file/delete/{id}' 		=> ['GET', "$path/FileController.php", 'delete', 'file.delete', true],
+		'file/share/{id}/{email}' => ['GET', "$path/FileUserController.php", 'addUserToConsult', 'file.share', true],
+		'file/shared' => ['GET', "$path/FileUserController.php", 'addUserDownload', 'file.shared', true],
 	];
 }
 
@@ -43,23 +45,18 @@ function get_route_parameters(string $request): bool
 	$buildRequest = "";
 	$toStore = [];
 
-	foreach ($routePaths as $segment)
-	{
-		if (str_starts_with($segment, ':'))
-		{
+	foreach ($routePaths as $segment) {
+		if (str_starts_with($segment, ':')) {
 			$hasParam = true;
 			$params = explode(';', substr($segment, 1));
 			$buildRequest .= "/{" . $params[0] . "}";
 			$toStore[$params[0]] = $params[1] ?? null;
-		}
-		else
-		{
+		} else {
 			$buildRequest .= "/$segment";
 		}
 	}
 
-	if (!$hasParam)
-	{
+	if (!$hasParam) {
 		return false;
 	}
 
@@ -78,23 +75,17 @@ function get_route_parameters(string $request): bool
 function routes_go_to_route(string $key): string
 {
 	$routes = routes_get_navigation();
-	foreach ($routes as $route => $values)
-	{
-		if ($values[3] === $key)
-		{
-			if ($values[4] && isLoggedIn() || !$values[4] && !isLoggedIn())
-			{
+	foreach ($routes as $route => $values) {
+		if ($values[3] === $key) {
+			if ($values[4] && isLoggedIn() || !$values[4] && !isLoggedIn()) {
 				return "/$route";
 			}
 		}
 	}
 
-	if (isLoggedIn())
-	{
+	if (isLoggedIn()) {
 		return '/user/dashboard';
-	}
-	else
-	{
+	} else {
 		return '/home';
 	}
 }
@@ -118,20 +109,17 @@ function routes_get_page(): string
  */
 function routes_get_route(string $request = null): array
 {
-	if ($request == null)
-	{
+	if ($request == null) {
 		$request = routes_get_page();
 	}
 
 	$routes = routes_get_navigation();
 
-	if (get_route_parameters($request))
-	{
+	if (get_route_parameters($request)) {
 		$request = $_REQUEST['route'];
 	}
 
-	if (array_key_exists($request, $routes))
-	{
+	if (array_key_exists($request, $routes)) {
 		return $routes[$request];
 	}
 
@@ -144,7 +132,9 @@ function routes_get_route(string $request = null): array
  * @return string Le nom de la route.
  */
 function routes_get_route_name(): string
-{ return routes_get_route()[3]; }
+{
+	return routes_get_route()[3];
+}
 
 /**
  * Récupère un paramètre spécifique de la requête actuelle.
@@ -152,8 +142,10 @@ function routes_get_route_name(): string
  * @param string $key La clé du paramètre à récupérer.
  * @return string|null La valeur du paramètre, ou null si non trouvé.
  */
-function routes_get_params (string $key): ?string
-{ return $_REQUEST['params'][$key] ?? null; }
+function routes_get_params(string $key): ?string
+{
+	return $_REQUEST['params'][$key] ?? null;
+}
 
 /**
  * Charge la vue correspondante à la route actuelle.
@@ -171,39 +163,31 @@ function routes_get_view(): void
 
 	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $method;
 
-	if (!$isGoodRequest)
-	{
+	if (!$isGoodRequest) {
 		on_error();
 		die();
 	}
 
-	if ($needAuth && !isLoggedIn())
-	{
+	if ($needAuth && !isLoggedIn()) {
 		$route = routes_get_route('home');
 		$controller = $route[1];
 		$function = $route[2];
 		$route_name = $route[3];
 	}
 
-	include_once ($controller);
+	include_once($controller);
 
-	if (function_exists($function))
-	{
+	if (function_exists($function)) {
 		$result = $function(app_get_path('views'));
 		$file = app_get_path('views') . '/' . $result['view'] . '.php';
 
-		if (isset($result['view']) && file_exists($file))
-		{
+		if (isset($result['view']) && file_exists($file)) {
 			$data = $result['data'];
-			include_once ($file);
-		}
-		else
-		{
+			include_once($file);
+		} else {
 			log_file("View file " . $result['view'] . " not found.");
 		}
-	}
-	else
-	{
+	} else {
 		log_file("Function $function not found.");
 	}
 }
