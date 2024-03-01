@@ -1,5 +1,6 @@
 <?php
 
+use app\Models\FileModel;
 use app\Models\UserModel;
 
 /**
@@ -76,6 +77,9 @@ if ($auto_user->find(1) == null)
 	$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
 	$auto_user->create($userArray);
 }
+
+$auto_file = new FileModel;
+$auto_file->migrate();
 
 include_once (app_get_path('models') . "FileModel.php");
 

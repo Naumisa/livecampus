@@ -91,7 +91,7 @@ abstract class Model
 		}
 	}
 
-	public function find(int $id): ?array
+	public function find(int $id): mixed
 	{
 		$result = db_fetch_data($this->table, 'id', $id);
 		return count($result) !== 0 ? $result[0] : null;
