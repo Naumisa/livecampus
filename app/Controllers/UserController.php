@@ -1,7 +1,9 @@
 <?php
 
 /**
- * @return array
+ * Affiche le profil d'un utilisateur spécifique par son ID.
+ *
+ * @return array Retourne les données de l'utilisateur et la vue associée.
  */
 function show(): array
 {
@@ -23,6 +25,11 @@ function show(): array
 	];
 }
 
+/**
+ * Prépare les données pour la vue du tableau de bord de l'utilisateur.
+ *
+ * @return array Retourne un tableau avec les données et la vue du tableau de bord.
+ */
 function dashboard(): array
 {
 	$data = [];
@@ -34,7 +41,9 @@ function dashboard(): array
 }
 
 /**
- * @return array
+ * Affiche le profil de l'utilisateur actuellement authentifié.
+ *
+ * @return array Retourne les données de l'utilisateur authentifié et la vue de profil.
  */
 function profile(): array
 {
@@ -47,7 +56,10 @@ function profile(): array
 }
 
 /**
- * @return array
+ * Traite la soumission du formulaire de mise à jour du profil de l'utilisateur.
+ * Met à jour les informations de l'utilisateur dans la base de données si elles sont modifiées.
+ *
+ * @return array Retourne les données mises à jour de l'utilisateur et redirige vers la vue de profil.
  */
 function edit() : array
 {
@@ -94,7 +106,9 @@ function edit() : array
 }
 
 /**
- * @return array
+ * Prépare la vue de connexion pour l'utilisateur.
+ *
+ * @return array Retourne les données nécessaires et la vue de connexion.
  */
 function login(): array
 {
@@ -107,8 +121,11 @@ function login(): array
 }
 
 /**
- * @return array
- * @throws \Random\RandomException
+ * Traite la tentative de connexion de l'utilisateur.
+ * Vérifie les identifiants, met à jour le token de l'utilisateur en cas de succès, et redirige vers le profil.
+ *
+ * @return array Retourne les erreurs rencontrées ou redirige l'utilisateur en cas de succès.
+ * @throws Exception En cas d'échec de génération de tokens aléatoires.
  */
 function login_attempt(): array
 {
@@ -164,7 +181,10 @@ function login_attempt(): array
 }
 
 /**
- * @return array
+ * Déconnecte l'utilisateur.
+ * Efface le token de l'utilisateur de la session et de la base de données, puis redirige.
+ *
+ * @return array Retourne les données nécessaires pour la vue après déconnexion.
  */
 function logout(): array
 {
@@ -185,7 +205,9 @@ function logout(): array
 }
 
 /**
- * @return array
+ * Prépare la vue d'enregistrement pour un nouvel utilisateur.
+ *
+ * @return array Retourne les données nécessaires et la vue d'enregistrement.
  */
 function register(): array
 {
@@ -198,8 +220,11 @@ function register(): array
 }
 
 /**
- * @return array
- * @throws \Random\RandomException
+ * Traite la tentative d'enregistrement d'un nouvel utilisateur.
+ * Vérifie la validité des données soumises, crée le nouvel utilisateur si possible, et redirige vers le profil.
+ *
+ * @return array Retourne les erreurs rencontrées ou redirige l'utilisateur en cas de succès.
+ * @throws Exception En cas d'échec de génération de tokens aléatoires.
  */
 function register_attempt(): array
 {
