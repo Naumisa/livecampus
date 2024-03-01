@@ -35,7 +35,7 @@ abstract class Model
 					continue;
 				}
 
-				$this->$field = $newModel[$field];
+				$this->$field = $newModel->$field;
 			}
 		} else {
 			log_file("Une erreur est survenue lors de la tentative de création du Model User.");

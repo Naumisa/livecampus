@@ -27,6 +27,8 @@ function log_file (string $message): void
 	{
 		error_log("Impossible d'écrire dans le fichier de log : " . $e->getMessage());
 	}
+
+    log_session($logMessage);
 }
 
 /**

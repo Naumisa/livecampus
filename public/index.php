@@ -1,9 +1,17 @@
 <?php
-  require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
-	require_once ("../config/app.php");
+require_once ("../config/app.php");
 
-	$root = __DIR__;
+$root = __DIR__;
+
+if (has_error())
+{
+	foreach (get_errors() as $error)
+	{
+		echo $error;
+	}
+}
 ?>
 
 <!DOCTYPE html>

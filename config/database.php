@@ -296,7 +296,7 @@ function db_create_model(string $modelTable, array $modelFields, array $modelDat
 {
 	foreach ($modelFields as $field => $details)
 	{
-		if (isset($details['unique']) && $details['unique'])
+		if (isset($details['unique']) && $details['unique'] && $field != 'id')
 		{
 			$existingData = db_fetch_data($modelTable, $field, $modelData[$field]);
 			if (!empty($existingData))

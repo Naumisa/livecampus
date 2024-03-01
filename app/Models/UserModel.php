@@ -105,4 +105,10 @@ class UserModel extends Model
 
 		$this->remember_token = $selector . ':' . $validator;
 	}
+
+    function storage_path(): string
+    {
+        global $root;
+        return $root . app_get_path('public_storage') . "uploads/" . $this->email . "/";
+    }
 }
