@@ -89,7 +89,7 @@ abstract class Model
 	{
 		$result = db_fetch_data($this->table, $column, $value);
 
-		if (count($result) === 0) {
+		if (!isset($result) || count($result) === 0) {
 			return null;
 		}
 
