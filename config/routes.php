@@ -11,9 +11,6 @@ function routes_get_navigation(): array
 	return [
 		'home' 						=> ['GET', 	"HomeController@index", 				'home', 					0],
 
-		//'services' 				=> ['GET', 	"$path/ServicesController@index", 		'services', 				0],
-		//'contact' 				=> ['GET', 	"$path/ContactController@index", 		'contact', 					0],
-
 		'user/login' 				=> ['GET', 	"UserController@login", 				'login', 					0],
 		'user/login/confirm' 		=> ['POST', "UserController@login_attempt", 		'login.confirmation', 		0],
 		'user/register' 			=> ['GET', 	"UserController@register", 				'register', 				0],
