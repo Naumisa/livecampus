@@ -27,11 +27,11 @@ protégée par mot de passe pour des raisons de confidentialité.
 
 Le site devra disposer des fonctionnalités suivantes :
 - Pour tout le monde :
-  - [ ] Créer un compte
-  - [ ] Se connecter
-  - [ ] Se déconnecter
+  - [x] Créer un compte
+  - [x] Se connecter
+  - [x] Se déconnecter
 - Pour une personne authentifiée
-  - [ ] Modifier son profil
+  - [x] Modifier son profil
   - [ ] Envoyer un fichier
   - [ ] Télécharger un fichier
   - [ ] Voir combien de fois un fichier a été téléchargé
