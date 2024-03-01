@@ -86,10 +86,9 @@ class FileModel extends Model
 	 * @param int $download_count
 	 * @return array
 	 */
-	function fill(int $id, string $name_origine, string $name_random, int $download_count): array
+	function fill(string $name_origine, string $name_random, int $download_count): array
 	{
 		return [
-			'file_id' => $id,
 			'name_origine' => $name_origine,
 			'name_random' => $name_random,
 			'download_count' => $download_count

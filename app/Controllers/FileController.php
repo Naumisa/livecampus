@@ -1,4 +1,7 @@
 <?php
+
+use app\Models\FileModel;
+
 /**
  * Fonction de contrôleur pour gérer l'envoi des fichiers.
  *
@@ -11,7 +14,7 @@ function upload(): array
     $file = $_FILES['dropzone-file'];
 
     // Traitement du formulaire pour l'ajout de fichiers
-    if($file != null){
+    if ($file != null) {
         $allowedExtensions = array("jpg", "jpeg", "png", "gif"); // Extensions autorisées
         $maxFileSize = 20 * 1024 * 1024; // Taille maximale autorisée (20 Mo)
 
@@ -26,7 +29,7 @@ function upload(): array
             $userEmail = auth_user()['email'];
             $hashedUserId = md5($userEmail); // Hachage de l'email de l'utilisateur
 
-			global $root;
+            global $root;
             $targetDir = $root . app_get_path('public_storage') . "uploads/" . $hashedUserId . "/"; // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
             if (!file_exists($targetDir)) {
@@ -40,12 +43,12 @@ function upload(): array
             $newFileName = "file_" . time() . "." . $fileExtension;
             $newTargetFile = $targetDir . $newFileName;
 
-            if(move_uploaded_file($file["tmp_name"], $newTargetFile)) {
+            if (move_uploaded_file($file["tmp_name"], $newTargetFile)) {
 
                 // Insérer les informations du fichier dans la base de données
                 $name_origine = $file["name"];
 
-				/* TODO-Hind
+                /* TODO-Hind
 				try {
 					file_insert($name_origine, $newFileName, 0); // Le compteur de téléchargement est initialement défini sur 0
 				}
@@ -56,14 +59,14 @@ function upload(): array
 				}
 				*/
 
-				/// INFO: Pour éviter d'afficher de manière non structurée sur la page
-				/// des éléments d'informations :
-				/// > log_info("Le fichier a été téléchargé avec succès.");
-				/// Ceci va t'ajouter le retour de cette ligne dans le fichier :
-				/// > /storage/logs/latest.log
-				/// Une prochaine fonction permettra de stocker l'information
-				/// pour en faire un retour propre sur la page.
-				echo "Le fichier a été téléchargé avec succès.";
+                /// INFO: Pour éviter d'afficher de manière non structurée sur la page
+                /// des éléments d'informations :
+                /// > log_info("Le fichier a été téléchargé avec succès.");
+                /// Ceci va t'ajouter le retour de cette ligne dans le fichier :
+                /// > /storage/logs/latest.log
+                /// Une prochaine fonction permettra de stocker l'information
+                /// pour en faire un retour propre sur la page.
+                echo "Le fichier a été téléchargé avec succès.";
             } else {
                 echo "Erreur lors du téléchargement du fichier.";
             }
@@ -71,7 +74,7 @@ function upload(): array
     }
 
     // Récupérer les fichiers de l'utilisateur depuis la base de données
-   	// $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
+    // $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
     //$files = file_get_by_user($userId); // Fonction pour récupérer les fichiers de l'utilisateur depuis la base de données
 
     return [
@@ -86,14 +89,33 @@ function upload(): array
  */
 function delete(): array
 {
-	$fileId = get_route_parameters('id'); // Récupère l'ID du fichier dont la suppression a été demandée
+    // Récupère l'ID du fichier dont la suppression a été demandée
+    $fileId = get_route_parameters('id');
+    // Récupère l'ID de l'utilisateur qui à créer le fichier
+    $fileUserId = get_route_parameters('userId');
+    // doit vérifier si le fichier appartient bien à l'utilisateur connecté
+    $user = auth_user();
+    $userId = $user->id;
+    // recupere le mail de l'utilisateur
+    $userEmail = $user->email;
+    // Hachage de l'email de l'utilisateur
+    $hashedUserId = md5($userEmail);
+    // Chemin du fichier
+    global $root;
+    $targetDir = $root . app_get_path('public_storage') . "uploads/" . $hashedUserId . "/"; // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
-	// doit vérifier si le fichier appartient bien à l'utilisateur connecté
+    $file = new FileModel;
+    // cherche le fichier avec l'id $fileId   
+    $file->find($fileId);
 
-	$data = [];
+    if ($fileUserId === $userId) {
+        unlink($targetDir . $file->name_random);
+    }
 
-	return [
-		'data' => $data,
-		'view' => "user/dashboard",
-	];
+    $data = [];
+
+    return [
+        'data' => $data,
+        'view' => "user/dashboard",
+    ];
 }

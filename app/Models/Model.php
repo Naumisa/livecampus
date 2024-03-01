@@ -12,7 +12,7 @@ abstract class Model
 	protected array $fields = [];
 	protected array $foreign_fields = [];
 
-	protected int $id = 0;
+	public int $id = 0;
 	protected string $created_at = '';
 	protected string $updated_at = '';
 
@@ -27,22 +27,17 @@ abstract class Model
 	{
 		$this->id = db_create_model($this->table, $this->fields, $data);
 
-		if ($this->id != null)
-		{
+		if ($this->id != null) {
 			$newModel = Model::find($this->id);
 
-			foreach ($this->fields as $field => $definition)
-			{
-				if (!isset($this->$field) and $this->$field != null)
-				{
+			foreach ($this->fields as $field => $definition) {
+				if (!isset($this->$field) and $this->$field != null) {
 					continue;
 				}
 
 				$this->$field = $newModel[$field];
 			}
-		}
-		else
-		{
+		} else {
 			log_file("Une erreur est survenue lors de la tentative de création du Model User.");
 		}
 
@@ -51,8 +46,7 @@ abstract class Model
 
 	public function save(): void
 	{
-		if ($this->state === static::MODEL_DELETED)
-		{
+		if ($this->state === static::MODEL_DELETED) {
 			log_file("Tentative de mise à jour d'un Model précédemment supprimé.");
 			return;
 		}
@@ -61,54 +55,46 @@ abstract class Model
 
 		$data = [];
 
-		foreach ($this->fields as $field => $definition)
-		{
-			if (!isset($this->$field) and $this->$field != null)
-			{
+		foreach ($this->fields as $field => $definition) {
+			if (!isset($this->$field) and $this->$field != null) {
 				continue;
 			}
 
 			$data[$field] = $this->$field;
 		}
 
-		if (!db_update($this->table, $this->id, $data))
-		{
+		if (!db_update($this->table, $this->id, $data)) {
 			log_file("Une erreur est survenue lors de la tentative de sauvegarde du Model.");
 		}
 	}
 
 	public function delete(): void
 	{
-		if ($this->state === static::MODEL_DELETED)
-		{
+		if ($this->state === static::MODEL_DELETED) {
 			log_file("Tentative de suppression d'un Model précédemment supprimé.");
 			return;
 		}
 
-		if (!db_delete($this->table, $this->id))
-		{
+		if (!db_delete($this->table, $this->id)) {
 			log_file("Une erreur est survenue lors de la tentative de suppression du Model.");
 		}
 	}
 
-	public function find(int $id): mixed
+	public function find(int $id): ?Model
 	{
-		$result = db_fetch_data($this->table, 'id', $id);
-		return count($result) !== 0 ? $result[0] : null;
+		return $this->first('id', $id);
 	}
 
 	public function first(string $column, string $value): ?Model
 	{
 		$result = db_fetch_data($this->table, $column, $value);
 
-		if (count($result) === 0)
-		{
+		if (count($result) === 0) {
 			return null;
 		}
 
 		$result = $result[0];
-		foreach ($result as $field => $data)
-		{
+		foreach ($result as $field => $data) {
 			$this->$field = $data;
 		}
 
