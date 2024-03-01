@@ -39,6 +39,12 @@ function file_get_fields(): array
             'unique' => false,
             'query' => 'INT DEFAULT 0',
         ],
+		'owner_id' => [
+			'type' => 'int',
+			'required' => false,
+			'unique' => false,
+			'query' => 'INT NOT NULL',
+		],
         'created_at' => [
             'type' => 'timestamp',
             'required' => false,
@@ -61,8 +67,8 @@ function file_get_fields(): array
 function file_get_foreign_keys (): array
 {
 	return [
-		'fk_owner_id' => [
-			'refer_to' => 'users',
+		'owner_id' => [
+			'refer_to' => 'users(id)',
 			'on_delete' => 'CASCADE',
 		],
 	];

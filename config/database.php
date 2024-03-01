@@ -167,7 +167,7 @@ function db_create_table(string $table, array $data, array $foreignData = null):
 	{
 		foreach ($foreignData as $column => $definition)
 		{
-			$constraintQuery = "ALTER TABLE $table ADD CONSTRAINT $column FOREIGN KEY ($column) REFERENCES " . $definition['references'] . ";";
+			$constraintQuery = "ALTER TABLE $table ADD CONSTRAINT fk_$column FOREIGN KEY ($column) REFERENCES " . $definition['refer_to'] . ";";
 			try
 			{
 				$db->exec($constraintQuery);

@@ -73,6 +73,10 @@ if (count(user_get_data_with_id(1)) == 0)
 {
 	user_create(user_get_data_array("admin", "admin@email.com", "password", 1));
 }
+
+include_once (app_get_path('models') . "FileModel.php");
+
+file_migrate();
 // END-TODO
 
 // Initialisation du système de liens de navigation selon le statut d'authentification
