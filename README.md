@@ -40,9 +40,17 @@ composer dump-autoload
 
 1 - Modification du fichier environnement
 
+- Dupliquez le fichier `example.env` en `.env` dans le même répertoire (racine).
 - Editez les valeurs du fichier `example.env` selon vos données d'installation.
-- Renommez ce fichier en `.env`.
 
 2 - Installation des tables requises
 
-*Coming soon*
+- Les tables sont crées de manière automatique et un utilisateur par défaut est
+  accessible au premier lancement de l'application
+
+```json
+{
+    "email": "admin@email.com",
+    "password": "password"
+}
+```
