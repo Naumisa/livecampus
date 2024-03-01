@@ -28,7 +28,7 @@ function log_file (string $message): void
 		error_log("Impossible d'écrire dans le fichier de log : " . $e->getMessage());
 	}
 
-    log_session($logMessage);
+    log_request($logMessage);
 }
 
 /**
@@ -36,13 +36,13 @@ function log_file (string $message): void
  * @param string $message Le message d'erreur à enregistrer.
  * @return void
  */
-function log_session (string $message): void
+function log_request (string $message): void
 {
-	if (!isset($_SESSION['errors']))
+	if (!isset($_REQUEST['errors']))
 	{
-		$_SESSION['errors'] = [];
+		$_REQUEST['errors'] = [];
 	}
-	$_SESSION['errors'][] = $message;
+	$_REQUEST['errors'][] = $message;
 }
 
 /**
@@ -51,7 +51,7 @@ function log_session (string $message): void
  */
 function has_error (): bool
 {
-	return !empty($_SESSION['errors']);
+	return !empty($_REQUEST['errors']);
 }
 
 /**
@@ -60,8 +60,8 @@ function has_error (): bool
  */
 function get_errors (): array
 {
-	$errors = $_SESSION['errors'] ?? [];
-	unset($_SESSION['errors']);
+	$errors = $_REQUEST['errors'] ?? [];
+	unset($_REQUEST['errors']);
 	return $errors;
 }
 

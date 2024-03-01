@@ -17,14 +17,12 @@ return [
 
 	// Navigation: logged out
 	'navigation.home' => 'Accueil',
-	'navigation.services' => 'Services',
-	'navigation.contact' => 'Contact',
 	'navigation.login' => 'Connexion',
 	'navigation.register' => 'S\'enregistrer',
 
 	// Navigation: logged in
-	'navigation.dashboard' => 'Tableau de bord',
-	'navigation.file' => 'Téléverser',
+	'navigation.dashboard' => 'Mes fichiers',
+	'navigation.files_shared' => 'Partagés avec moi',
 	'navigation.profile' => 'Mon compte',
 	'navigation.logout' => 'Se déconnecter',
 
@@ -34,17 +32,8 @@ return [
 	// Page d'accueil
 	'home.title' => 'Accueil',
 
-	// Page de Services
-	'services.title' => 'Nos services',
-	'services.service_01' => 'Toutes nos préparations sont réalisés sur place.',
-	'services.service_02' => 'Nos aliments sont frais, locaux et sélectionnés avec soins.',
-	'services.service_03' => 'Accueil et service agréable et de qualité.',
-
-	// Page de Contact
-	'contact.title' => 'Nous contacter',
-
 	// Page de Tableau de bord
-	'dashboard.title' => 'Tableau de bord',
+	'dashboard.title' => 'Mes fichiers',
 	'dashboard.file_upload' => 'Téléverser un fichier',
 	'dashboard.files_count' => 'Total de fichiers',
 	'dashboard.total_size' => 'Taille sur stockage',
@@ -73,6 +62,8 @@ return [
 	'file_upload.cancel' => 'Annuler',
 	'file.upload.title' => 'Tableau de bord',
 
+	'files.shared.title' => 'Partagés avec moi',
+
 	// Page de Connexion
 	'login.title' => 'Connexion',
 	'login.email' => 'Adresse e-mail',
@@ -92,5 +83,7 @@ return [
 
 	// Page des informations de l'utilisateur
 	'profile.title' => 'Vos informations',
-	'profile.edit.title' => 'Vos informations'
+	'profile.edit.title' => 'Vos informations',
+
+	'show-user.title' => 'Admin > Fiche utilisateur (%s)',
 ];
