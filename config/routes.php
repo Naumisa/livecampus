@@ -23,8 +23,8 @@ function routes_get_navigation(): array
 
 		'files/upload' 				=> ['POST', "FileController@upload", 				'file.upload', 				1],
 		'files/delete/{id}' 		=> ['GET', 	"FileController@delete", 				'file.delete', 				1],
-		'files/share/{id}/{email}' 	=> ['GET', 	"FileUserController@addUserToConsult", 	'file.share', 				1],
-		'files/shared' 				=> ['GET', 	"FileUserController@addUserDownload", 	'files.shared', 			1],
+		'files/share/{id}/{email}' 	=> ['GET', 	"FileController@share", 				'file.share', 				1],
+		'files/shared' 				=> ['GET', 	"FileController@shared", 				'files.shared', 			1],
 
 		'admin/users'				=> ['GET', 	"UserController@show", 					'show-users', 				2],
 		'admin/user/{id}'			=> ['GET', 	"UserController@show", 					'show-user', 				2],

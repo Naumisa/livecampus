@@ -1,6 +1,8 @@
 <?php
 
 use app\Models\FileModel;
+use app\Models\FileUserModel;
+use app\Models\UserModel;
 
 /**
  * Fonction de contrôleur pour gérer l'envoi des fichiers.
@@ -14,21 +16,29 @@ function upload(): array
     $file = $_FILES['dropzone-file'];
 
     // Traitement du formulaire pour l'ajout de fichiers
-    if ($file != null) {
-        $allowedExtensions = array("jpg", "jpeg", "png", "gif"); // Extensions autorisées
+    if ($file != null)
+	{
+        $excludedExtensions = array("php", "html", "js", "sql"); // Extensions autorisées
         $maxFileSize = 20 * 1024 * 1024; // Taille maximale autorisée (20 Mo)
 
         $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $fileSize = $file["size"];
 
-        if (!in_array($fileExtension, $allowedExtensions)) {
-            log_file ("Erreur : Seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.");
-        } elseif ($fileSize > $maxFileSize) {
+        if (in_array($fileExtension, $excludedExtensions))
+		{
+            log_file ("Erreur : Les fichiers de type $fileExtension ne sont pas autorisés.");
+			die();
+        }
+		elseif ($fileSize > $maxFileSize)
+		{
             log_file ("Erreur : La taille du fichier dépasse la limite de 20 Mo.");
-        } else {
+			die();
+        }
+		else {
             $targetDir = auth_user()->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
-            if (!file_exists($targetDir)) {
+            if (!file_exists($targetDir))
+			{
                 mkdir($targetDir, 0777, true); // Créer le dossier s'il n'existe pas
             }
 
@@ -36,8 +46,8 @@ function upload(): array
             $newFileName = "file_" . time() . "." . $fileExtension;
             $newTargetFile = $targetDir . $newFileName;
 
-            if(move_uploaded_file($file["tmp_name"], $newTargetFile)) {
-
+            if (move_uploaded_file($file["tmp_name"], $newTargetFile))
+			{
                 // Insérer les informations du fichier dans la base de données
                 $name_origine = $file["name"];
 
@@ -46,16 +56,20 @@ function upload(): array
                     $data = $fileModel->fill($name_origine, $newFileName);//L'envoy du fichier
                     $data['owner_id'] = auth_user()->id;//Recherche de l'id
                     $fileModel->create($data);
+
+					header('Location: /user/dashboard');
+					log_file ("Le fichier a été téléchargé avec succès.");
+					die();
                 }
 				catch (Exception $e)
 				{
                     log_file ("Erreur lors du téléchargement du fichier : " . $e->getMessage());
 					die();
 				}
-
-                log_file ("Le fichier a été téléchargé avec succès.");
-            } else {
+            }
+			else {
                 log_file ("Erreur lors du téléchargement du fichier.");
+				die();
             }
         }
     }
@@ -81,12 +95,7 @@ function delete(): array
     // doit vérifier si le fichier appartient bien à l'utilisateur connecté
     $user = auth_user();
     $userId = $user->id;
-    // recupere le mail de l'utilisateur
-    $userEmail = $user->email;
-    // Hachage de l'email de l'utilisateur
-    $hashedUserId = md5($userEmail);
     // Chemin du fichier
-    global $root;
     $targetDir = $user->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
     $file = new FileModel;
@@ -96,6 +105,9 @@ function delete(): array
     if ($fileUserId === $userId) {
         unlink($targetDir . $file->name_random);
         $file->delete();
+
+		header('Location: ' . routes_go_to_route('dashboard'));
+		die();
     }
 
     $user = auth_user();
@@ -106,4 +118,58 @@ function delete(): array
         'data' => $data,
         'view' => "user/dashboard",
     ];
+}
+
+function share(): array
+{
+	// recupere l'email saisie de l'utilisateur à qui partager le fichier
+	$userMail = filter_input(INPUT_POST, 'mail_to_share'); //paramettre a modifier en fonction du button
+	// recupere les donnees de l'utilisateur correpondant a l'email
+	$user = new UserModel;
+	$user->first('email', $userMail);
+	if ($user->email === null)
+	{
+		log_file("Cette e-mail n'existe pas");
+	}
+	else {
+		// recupere l'id de l'utilisateur
+		$userId = $user->id;
+		// recupere l'id du fichier
+		$fileId = (int)routes_get_params('id');
+		// creer les donnees a envoyer
+		$data = ['user_id' => $userId, 'file_id' => $fileId];
+		// ajoute a la table file_user les donnees
+		$fileUser = new FileUserModel;
+		$fileUser->create($data);
+
+		header('Location: ' . routes_go_to_route('files.shared'));
+		die();
+	}
+
+
+	$user = auth_user();
+	$data['files'] = $user->files();
+	$data['user_storage_path'] = $user->storage_path();
+
+	return [
+		'data' => $data,
+		'view' => "user/dashboard",
+	];
+}
+
+/**
+ * Fonction de contrôleur pour gérer l'affichage des fichiers partagés.
+ *
+ * @return array Données et vue à afficher.
+ */
+function shared(): array
+{
+	$user = auth_user();
+	$data['files'] = $user->sharedFiles();
+	$data['user_storage_path'] = $user->storage_path();
+
+	return [
+		'data' => $data,
+		'view' => "user/dashboard",
+	];
 }
