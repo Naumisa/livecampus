@@ -26,7 +26,7 @@ function upload(): array
         } elseif ($fileSize > $maxFileSize) {
             echo "Erreur : La taille du fichier dépasse la limite de 20 Mo.";
         } else {
-            $userEmail = auth_user()['email'];
+            $userEmail = auth_user()->email;
             $hashedUserId = md5($userEmail); // Hachage de l'email de l'utilisateur
 
             global $root;
@@ -90,9 +90,8 @@ function upload(): array
 function delete(): array
 {
     // Récupère l'ID du fichier dont la suppression a été demandée
-    $fileId = get_route_parameters('id');
+    $fileId = routes_get_params('id');
     // Récupère l'ID de l'utilisateur qui à créer le fichier
-    $fileUserId = get_route_parameters('userId');
     // doit vérifier si le fichier appartient bien à l'utilisateur connecté
     $user = auth_user();
     $userId = $user->id;
@@ -107,9 +106,10 @@ function delete(): array
     $file = new FileModel;
     // cherche le fichier avec l'id $fileId   
     $file->find($fileId);
-
+    $fileUserId = $file->owner_id;
     if ($fileUserId === $userId) {
         unlink($targetDir . $file->name_random);
+        $file->delete();
     }
 
     $data = [];
