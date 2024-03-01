@@ -1,8 +1,9 @@
 <?php
 
 /**
- * @param string $key
- * @return string
+ * Récupère le chemin d'accès spécifié à partir d'un ensemble prédéfini de chemins.
+ * @param string $key Clé identifiant le chemin d'accès souhaité.
+ * @return string Le chemin d'accès correspondant à la clé.
  */
 function app_get_path (string $key): string
 {
@@ -19,13 +20,14 @@ function app_get_path (string $key): string
 }
 
 /**
+ * Charge les variables d'environnement depuis un fichier .env pour une configuration centralisée.
  * @return void
  */
 function app_get_environment(): void
 {
 	$path = "../.env";
 	if (!file_exists($path)) {
-		log_file("The .env file doesn't exist : $path");
+		log_file("e fichier .env n'existe pas : $path");
 	}
 
 	$lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -49,6 +51,7 @@ function app_get_environment(): void
 
 app_get_environment();
 
+// Chargement des fichiers de configuration spécifiques à l'application
 $configs = [
 	'database',
 	'auth',
@@ -62,8 +65,6 @@ foreach ($configs as $config)
 	require_once ("../config/$config.php");
 }
 
-$languages = lang_get_array(getenv('DEFAULT_LANG') ?? 'fr');
-
 // TODO: Use this for Authentification
 include_once (app_get_path('models') . "UserModel.php");
 
@@ -74,6 +75,7 @@ if (count(user_get_data_with_id(1)) == 0)
 }
 // END-TODO
 
+// Initialisation du système de liens de navigation selon le statut d'authentification
 $loggedOutLinks = [
 	'home' => 'navigation.home',
 	'services' => 'navigation.services',
