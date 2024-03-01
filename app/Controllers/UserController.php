@@ -1,5 +1,7 @@
 <?php
 
+use app\Models\UserModel;
+
 /**
  * Affiche le profil d'un utilisateur spécifique par son ID.
  *
@@ -14,7 +16,8 @@ function show(): array
 
 	if ($id != null)
 	{
-		$user = user_get_data_with_id((int) $id);
+		$user = new UserModel();
+		$user = $user->find((int) $id);
 
 		$data['user'] = $user;
 	}
@@ -64,7 +67,7 @@ function profile(): array
 function edit() : array
 {
 	# Get current user's datas
-    $data['user'] = auth_user();
+	$user = auth_user();
 
     # Get user's new datas from the form
     $new_username = trim(
@@ -84,19 +87,15 @@ function edit() : array
 
     # Update user's datas if modified
 	if(
-		$data['user']['email'] !== $new_email ||
-		$data['user']['username'] !== $new_username
+		$user->email !== $new_email ||
+		$user->username !== $new_username
 	){
-    	$data['user']['email'] = $new_email;
-		$data['user']['username'] = $new_username;
-    	user_update(
-    	    $data['user']['id'],
-    	    [
-    	        'username' => $new_username,
-    	        'email' => $new_email
-    	    ]
-    	);
+		$user->email = $new_email;
+		$user->username = $new_username;
+		$user->save();
 	};
+
+	$data['user'] = $user;
 
     # Go back to profile page
     return [
@@ -144,20 +143,20 @@ function login_attempt(): array
 
 	$result = [];
 	if ($isValid) {
-		$user = user_get_data_with_email($data['user_email']);
+		$user = new UserModel;
+		$user = $user->first('email', $data['user_email']);
 
 		if ($user != null)
 		{
-			if (password_verify($data['user_password'], $user['password']))
+			if (password_verify($data['user_password'], $user->password))
 			{
-				$token = user_generate_tokens();
-
-				user_update((int) $user['id'], [ 'remember_token' => $token ]);
+				$user->generate_token();
+				$user->save();
 
 				header('Location: /user/profile');
 
-				$_SESSION['token'] = $token;
-				$_SESSION['email'] = $user['email'];
+				$_SESSION['token'] = $user->remember_token;
+				$_SESSION['email'] = $user->email;
 
 				die();
 			}
@@ -188,10 +187,9 @@ function login_attempt(): array
  */
 function logout(): array
 {
-	$newData = [ 'remember_token' => null ];
-
 	$user = auth_user();
-	user_update($user['id'], $newData);
+	$user->remember_token = null;
+	$user->save();
 
 	unset($_SESSION['token']);
 	unset($_SESSION['email']);
@@ -250,28 +248,28 @@ function register_attempt(): array
 
 	$result = [];
 	if ($isValid) {
-		$user = user_get_data_with_email($data['user_email']);
+		$findUser = new UserModel;
+		$findUser = $findUser->first('email', $data['user_email']);
 
-		if ($user == null)
+		if ($findUser == null)
 		{
-			$token = user_generate_tokens();
+			$user = new UserModel;
 
-			$username = explode('@', $data['user_email'])[0];
 			$newData = [];
-			$newData['username'] = $username;
 			foreach ($data as $key => $value)
 			{
 				$newData[str_replace('user_', '', $key)] = $value;
 			}
-			$newData['password'] = password_hash($newData['password'], PASSWORD_DEFAULT);
-			$newData['rememberToken'] = $token;
 
-			$user = user_create($newData);
+			$user->create($newData);
+
+			$user->generate_token();
+			$user->save();
 
 			header('Location: /user/profile');
 
-			$_SESSION['token'] = $token;
-			$_SESSION['email'] = $user['email'];
+			$_SESSION['token'] = $user->remember_token;
+			$_SESSION['email'] = $user->email;
 
 			die();
 		}

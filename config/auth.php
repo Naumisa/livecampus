@@ -1,13 +1,15 @@
 <?php
 
+use app\Models\UserModel;
+
 /**
- * @return array|null
+ * @return UserModel|null
  */
-function auth_user (): ?array
+function auth_user (): ?UserModel
 {
 	if (isset($_SESSION['token']))
 	{
-		return user_get_data_with_token($_SESSION['token'])[0];
+		return get_user_with_token($_SESSION['token']);
 	}
 	else
 	{
@@ -17,11 +19,12 @@ function auth_user (): ?array
 
 /**
  * @param string $token
- * @return array
+ * @return array|null
  */
-function user_get_data_with_token (string $token): array
+function get_user_with_token (string $token): ?UserModel
 {
-	return db_fetch_data('users', 'remember_token', $token);
+	$user = new UserModel;
+	return $user->first('remember_token', $token);
 }
 
 /**
@@ -34,7 +37,7 @@ function isLoggedIn (): bool
  * @return bool
  */
 function isAdmin (): bool
-{ return auth_user()['role'] === 1; }
+{ return auth_user()->role === 1; }
 
 session_start();
 

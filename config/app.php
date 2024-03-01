@@ -1,5 +1,7 @@
 <?php
 
+use app\Models\UserModel;
+
 /**
  * Récupère le chemin d'accès spécifié à partir d'un ensemble prédéfini de chemins.
  * @param string $key Clé identifiant le chemin d'accès souhaité.
@@ -65,18 +67,19 @@ foreach ($configs as $config)
 	require_once ("../config/$config.php");
 }
 
-// TODO: Use this for Authentification
-include_once (app_get_path('models') . "UserModel.php");
+// Création automatique de la table et d'un utilisateur admin.
+$auto_user = new UserModel;
+$auto_user->migrate();
 
-user_migrate();
-if (count(user_get_data_with_id(1)) == 0)
+if ($auto_user->find(1) == null)
 {
-	user_create(user_get_data_array("admin", "admin@email.com", "password", 1));
+	$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
+	$auto_user->create($userArray);
 }
 
 include_once (app_get_path('models') . "FileModel.php");
 
-file_migrate();
+//file_migrate();
 // END-TODO
 
 // Initialisation du système de liens de navigation selon le statut d'authentification

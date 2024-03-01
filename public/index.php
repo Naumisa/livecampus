@@ -1,4 +1,6 @@
 <?php
+  require __DIR__.'/../vendor/autoload.php';
+
 	require_once ("../config/app.php");
 
 	$root = __DIR__;

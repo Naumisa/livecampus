@@ -4,6 +4,7 @@
 
 # Ignore auto generate components files
 /node_modules
+/vendor
 /public/build
 
 # Ignore linked folder

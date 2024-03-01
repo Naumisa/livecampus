@@ -186,15 +186,15 @@ function db_create_table(string $table, array $data, array $foreignData = null):
  * Insère de nouvelles données dans une table spécifique.
  * @param string $table Le nom de la table où insérer les données.
  * @param array $data Les données à insérer sous forme de tableau associatif colonne => valeur.
- * @return bool True si l'insertion réussit, False sinon.
+ * @return int ID du nouvel objet si l'insertion réussie, 0 sinon.
  */
-function db_insert(string $table, array $data): bool
+function db_insert(string $table, array $data): int
 {
 	$db = db_connect();
 
 	if ($db == null)
 	{
-		return false;
+		return 0;
 	}
 
 	$columns = implode(', ', array_keys($data));
@@ -210,10 +210,10 @@ function db_insert(string $table, array $data): bool
 	catch (PDOException $e)
 	{
 		log_file("Erreur lors de l'insertion dans la table $table : " . $e->getMessage());
-		return false;
+		return 0;
 	}
 
-	return true;
+	return $db->lastInsertId();
 }
 
 /**
@@ -290,12 +290,10 @@ function db_delete(string $table, int $id): bool
  * @param string $modelTable Le nom de la table dans laquelle insérer les données.
  * @param array $modelFields Les champs du modèle avec leurs contraintes (type, unicité, etc.).
  * @param array $modelData Les données à insérer sous forme de tableau associatif (colonne → valeur).
- * @return bool Retourne true si l'insertion réussit, false en cas d'échec ou de non-respect des contraintes.
+ * @return int Retourne ID si l'insertion réussie, 0 en cas d'échec ou de non-respect des contraintes.
  */
-function db_create_model(string $modelTable, array $modelFields, array $modelData): bool
+function db_create_model(string $modelTable, array $modelFields, array $modelData): int
 {
-	$isUnique = true;
-
 	foreach ($modelFields as $field => $details)
 	{
 		if (isset($details['unique']) && $details['unique'])
@@ -304,7 +302,7 @@ function db_create_model(string $modelTable, array $modelFields, array $modelDat
 			if (!empty($existingData))
 			{
 				log_file("Violation d'unicité pour $field avec la valeur " . $modelData[$field]);
-				return false;
+				return 0;
 			}
 		}
 	}
@@ -314,12 +312,12 @@ function db_create_model(string $modelTable, array $modelFields, array $modelDat
 	{
 		if (!isset($modelData[$field]) && $details['required']) {
 			log_file("Champ requis manquant : $field");
-			return false;
+			return 0;
 		}
 		elseif (isset($modelData[$field]) && !db_verify_data($modelData[$field], $details['type']))
 		{
 			log_file("Type de donnée invalide pour $field. Attendu : " . $details['type']);
-			return false;
+			return 0;
 		}
 
 		if (isset($modelData[$field]))

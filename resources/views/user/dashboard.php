@@ -45,7 +45,7 @@
 
 				<td class="px-4 py-2">18 Mo</td>
 				<td class="px-4 py-2">2 <?= lang_get('file_info.count') ?></td>
-				<td class="px-4 py-2"><?= auth_user()['email'] ?></td>
+				<td class="px-4 py-2"><?= auth_user()->email ?></td>
 				<td class="px-4 py-2">Il y a 5 minutes</td>
 				<td class="px-4 py-2">
 					<div class="flex items-center space-x-2">

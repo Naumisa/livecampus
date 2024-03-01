@@ -1,0 +1,17 @@
+{
+	"name": "naumisa/livecampus",
+	"description": "description",
+	"minimum-stability": "stable",
+	"license": "proprietary",
+	"authors": [
+		{
+			"name": "WAGNER Thomas",
+			"email": "twagner@antropus.fr"
+		}
+	],
+    "autoload": {
+      "psr-4": {
+        "app\\": "app/"
+      }
+    }
+}
