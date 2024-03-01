@@ -2,6 +2,8 @@
 
 namespace app\Models;
 
+use PDO;
+
 class FileModel extends Model
 {
 	protected string $table = 'files';
@@ -67,16 +69,6 @@ class FileModel extends Model
 	{
 		$user = new UserModel;
 		return $user->find($this->owner_id);
-	}
-
-	public function create(array $data): void
-	{
-		/* TODO-Hind: Changement pour gestion des fichiers
-		$data['username'] = explode('@', $data['email'])[0];
-		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-		*/
-
-		parent::create($data);
 	}
 
 	/**

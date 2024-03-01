@@ -22,15 +22,15 @@ function upload(): array
         $fileSize = $file["size"];
 
         if (!in_array($fileExtension, $allowedExtensions)) {
-            echo "Erreur : Seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.";
+            log_file ("Erreur : Seuls les fichiers JPG, JPEG, PNG et GIF sont autorisés.");
         } elseif ($fileSize > $maxFileSize) {
-            echo "Erreur : La taille du fichier dépasse la limite de 20 Mo.";
+            log_file ("Erreur : La taille du fichier dépasse la limite de 20 Mo.");
         } else {
             $userEmail = auth_user()->email;
             $hashedUserId = md5($userEmail); // Hachage de l'email de l'utilisateur
 
-            global $root;
-            $targetDir = $root . app_get_path('public_storage') . "uploads/" . $hashedUserId . "/"; // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
+			global $root;
+            $targetDir = auth_user()->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
             if (!file_exists($targetDir)) {
                 mkdir($targetDir, 0777, true); // Créer le dossier s'il n'existe pas
@@ -43,42 +43,31 @@ function upload(): array
             $newFileName = "file_" . time() . "." . $fileExtension;
             $newTargetFile = $targetDir . $newFileName;
 
-            if (move_uploaded_file($file["tmp_name"], $newTargetFile)) {
+            if(move_uploaded_file($file["tmp_name"], $newTargetFile)) {
 
                 // Insérer les informations du fichier dans la base de données
                 $name_origine = $file["name"];
 
-                /* TODO-Hind
 				try {
-					file_insert($name_origine, $newFileName, 0); // Le compteur de téléchargement est initialement défini sur 0
-				}
+                    $fileModel = new FileModel();//Création du fichier
+                    $data = $fileModel->fill($name_origine, $newFileName);//L'envoy du fichier
+                    $data['owner_id'] = auth_user()->id;//Recherche de l'id
+                    $fileModel->create($data);
+                }
 				catch (Exception $e)
 				{
-					echo "Erreur lors du téléchargement du fichier : " . $e->getMessage();
+                    log_file ("Erreur lors du téléchargement du fichier : " . $e->getMessage());
 					die();
 				}
-				*/
 
-                /// INFO: Pour éviter d'afficher de manière non structurée sur la page
-                /// des éléments d'informations :
-                /// > log_info("Le fichier a été téléchargé avec succès.");
-                /// Ceci va t'ajouter le retour de cette ligne dans le fichier :
-                /// > /storage/logs/latest.log
-                /// Une prochaine fonction permettra de stocker l'information
-                /// pour en faire un retour propre sur la page.
-                echo "Le fichier a été téléchargé avec succès.";
+                log_file ("Le fichier a été téléchargé avec succès.");
             } else {
-                echo "Erreur lors du téléchargement du fichier.";
+                log_file ("Erreur lors du téléchargement du fichier.");
             }
         }
     }
 
-    // Récupérer les fichiers de l'utilisateur depuis la base de données
-    // $userId = (auth_user()); // Fonction fictive pour récupérer l'ID de l'utilisateur connecté
-    //$files = file_get_by_user($userId); // Fonction pour récupérer les fichiers de l'utilisateur depuis la base de données
-
     return [
-        //'files' => $files,
         'data' => $data,
         'view' => "user/dashboard",
     ];
