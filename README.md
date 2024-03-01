@@ -30,6 +30,12 @@ ln -r -s ./storage/public ./public/storage
 ln -r -s ./resources/js/app.js ./public/build/app.js
 ```
 
+4 - Génération des fichiers de chargements
+
+```bash
+composer dump-autoload
+```
+
 ### Back
 
 1 - Modification du fichier environnement

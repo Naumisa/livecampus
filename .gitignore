@@ -6,6 +6,8 @@
 /node_modules
 /vendor
 /public/build
+/package-lock.json
+/composer.lock
 
 # Ignore linked folder
 /public/storage
@@ -15,4 +17,3 @@
 
 # Ignore local environnements datas
 /.env
-/package-lock.json
