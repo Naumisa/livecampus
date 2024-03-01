@@ -106,9 +106,24 @@ class UserModel extends Model
 		$this->remember_token = $selector . ':' . $validator;
 	}
 
+    /**
+     * @return string Returns the storage path of the user's files.
+     */
     function storage_path(): string
     {
         global $root;
-        return $root . app_get_path('public_storage') . "uploads/" . $this->email . "/";
+        return $root.app_get_path('public_storage')."uploads/".$this->email."/";
+    }
+
+    /**
+     * @return array Returns the informations of the user's files.
+     */
+    function files() : array
+    {
+        return db_fetch_data(
+            'files',
+            'owner_id',
+            $this->id
+        );
     }
 }

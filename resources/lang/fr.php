@@ -71,6 +71,7 @@ return [
 	'file_upload.upload_max_size' => 'Taille maximum: 20 Mo',
 	'file_upload.send' => 'Envoyer',
 	'file_upload.cancel' => 'Annuler',
+	'file.upload.title' => 'Tableau de bord',
 
 	// Page de Connexion
 	'login.title' => 'Connexion',

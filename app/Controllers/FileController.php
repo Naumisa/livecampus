@@ -67,6 +67,10 @@ function upload(): array
         }
     }
 
+    $user = auth_user();
+	$data['files'] = $user->files();
+	$data['user_storage_path'] = $user->storage_path();
+
     return [
         'data' => $data,
         'view' => "user/dashboard",
@@ -101,7 +105,9 @@ function delete(): array
         $file->delete();
     }
 
-    $data = [];
+    $user = auth_user();
+	$data['files'] = $user->files();
+	$data['user_storage_path'] = $user->storage_path();
 
     return [
         'data' => $data,

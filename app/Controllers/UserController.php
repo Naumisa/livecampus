@@ -35,7 +35,9 @@ function show(): array
  */
 function dashboard(): array
 {
-	$data = [];
+	$user = auth_user();
+	$data['files'] = $user->files();
+	$data['user_storage_path'] = $user->storage_path();
 
 	return [
 		'data' => $data,
@@ -66,36 +68,35 @@ function profile(): array
  */
 function edit() : array
 {
-	# Get current user's datas
-	$user = auth_user();
+    # Get current user's datas
+    $user = auth_user();
 
     # Get user's new datas from the form
     $new_username = trim(
-		filter_input(
-	        INPUT_POST,
-    	    'username',
-        	FILTER_DEFAULT
-    	)
-	);
+        filter_input(
+            INPUT_POST,
+            'username',
+            FILTER_DEFAULT
+        )
+    );
     $new_email = trim(
-		filter_input(
-	        INPUT_POST,
-    	    'email',
-        	FILTER_DEFAULT
-    	)
-	);
+        filter_input(
+            INPUT_POST,
+            'email',
+            FILTER_DEFAULT
+        )
+    );
 
     # Update user's datas if modified
-	if(
-		$user->email !== $new_email ||
-		$user->username !== $new_username
-	){
-		$user->email = $new_email;
-		$user->username = $new_username;
-		$user->save();
-	};
-
-	$data['user'] = $user;
+    if(
+        $user->email !== $new_email ||
+        $user->username !== $new_username
+    ){
+        $user->email = $new_email;
+        $user->username = $new_username;
+        $user->save();
+    };
+    $data['user'] = $user;
 
     # Go back to profile page
     return [
