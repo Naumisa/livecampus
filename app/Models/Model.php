@@ -18,6 +18,8 @@ abstract class Model
 
 	private int $state = 0;
 
+	private array $query = [];
+
 	public function migrate(): void
 	{
 		db_create_table($this->table, $this->fields, $this->foreign_fields);
@@ -87,22 +89,39 @@ abstract class Model
 
 	public function first(string $column, string $value): ?Model
 	{
-		$result = db_fetch_data($this->table, $column, $value);
+		$this->where($column, $value);
 
-		if (!isset($result) || count($result) === 0) {
+		if (empty($this->query))
+		{
 			return null;
 		}
 
-		$result = $result[0];
-		foreach ($result as $field => $data) {
-			$this->$field = $data;
-		}
+		return $this->get(0);
+	}
 
-		return $this;
+	public function get(int $id): Model
+	{
+		return $this->parse_in_model($this->query[$id]);
+	}
+
+	public function where(string $column, string $value): int
+	{
+		$this->query = db_fetch_data($this->table, $column, $value);
+		return !empty($this->query) ? count($this->query) : 0;
 	}
 
 	public function all(): ?array
 	{
 		return db_fetch_table($this->table);
+	}
+
+	public function parse_in_model(array $data): Model
+	{
+		foreach ($data as $field => $value)
+		{
+			$this->$field = $value;
+		}
+
+		return $this;
 	}
 }

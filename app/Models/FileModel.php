@@ -2,8 +2,6 @@
 
 namespace app\Models;
 
-use PDO;
-
 class FileModel extends Model
 {
 	protected string $table = 'files';

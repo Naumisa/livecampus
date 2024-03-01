@@ -26,18 +26,11 @@ function upload(): array
         } elseif ($fileSize > $maxFileSize) {
             log_file ("Erreur : La taille du fichier dépasse la limite de 20 Mo.");
         } else {
-            $userEmail = auth_user()->email;
-            $hashedUserId = md5($userEmail); // Hachage de l'email de l'utilisateur
-
-			global $root;
             $targetDir = auth_user()->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
             if (!file_exists($targetDir)) {
                 mkdir($targetDir, 0777, true); // Créer le dossier s'il n'existe pas
             }
-
-            $fileName = $file["name"];
-            $targetFile = $targetDir . $fileName;
 
             // Téléchargement du fichier avec un nom différent
             $newFileName = "file_" . time() . "." . $fileExtension;
@@ -94,10 +87,10 @@ function delete(): array
     $hashedUserId = md5($userEmail);
     // Chemin du fichier
     global $root;
-    $targetDir = $root . app_get_path('public_storage') . "uploads/" . $hashedUserId . "/"; // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
+    $targetDir = $user->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
     $file = new FileModel;
-    // cherche le fichier avec l'id $fileId   
+    // cherche le fichier avec l'id $fileId
     $file->find($fileId);
     $fileUserId = $file->owner_id;
     if ($fileUserId === $userId) {

@@ -112,7 +112,7 @@ class UserModel extends Model
     function storage_path(): string
     {
         global $root;
-        return $root.app_get_path('public_storage')."uploads/".$this->email."/";
+        return $root . app_get_path('public_storage') . "uploads/" . md5($this->email) . "/";
     }
 
     /**
