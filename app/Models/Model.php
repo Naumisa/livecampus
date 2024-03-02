@@ -2,124 +2,174 @@
 
 namespace app\Models;
 
+use back\Models\DatabaseModel;
+
 abstract class Model
 {
 	const MODEL_READY = 0;
 	const MODEL_CREATED = 1;
 	const MODEL_DELETED = 2;
 
-	protected string $table;
-	protected array $fields = [];
-	protected array $foreign_fields = [];
+	protected static string $table;
+	protected static array $fields = [];
+	protected static array $foreign_fields = [];
 
 	public int $id = 0;
 	public string $created_at = '';
 	public string $updated_at = '';
+	public array $data = [];
 
-	private int $state = 0;
+	private int $state = self::MODEL_READY;
 
-	public array $query = [];
+	protected static DatabaseModel $db;
+
+	public function __construct()
+	{
+		static::$db = new DatabaseModel();
+	}
 
 	public function migrate(): void
 	{
-		db_create_table($this->table, $this->fields, $this->foreign_fields);
+		static::$db->create_table(static::$table, static::$fields, static::$foreign_fields);
 	}
 
-	public function create(array $data): void
+	public static function create(array $data): ?self
 	{
-		$this->id = db_create_model($this->table, $this->fields, $data);
+		$id = static::$db->insert(static::$table, $data);
 
-		if ($this->id != null) {
-			$newModel = Model::find($this->id);
-
-			foreach ($this->fields as $field => $definition) {
-				if (!isset($this->$field) and $this->$field != null) {
-					continue;
-				}
-
-				$this->$field = $newModel->$field;
-			}
+		if ($id > 0) {
+			return static::find($id);
 		} else {
 			log_file("Une erreur est survenue lors de la tentative de création du Model User.");
+			return null;
 		}
-
-		$this->state = self::MODEL_CREATED;
 	}
 
 	public function save(): void
 	{
-		if ($this->state === static::MODEL_DELETED) {
+		if ($this->state === self::MODEL_DELETED) {
 			log_file("Tentative de mise à jour d'un Model précédemment supprimé.");
 			return;
 		}
 
 		$this->updated_at = date('Y-m-d H:i:s');
 
-		$data = [];
+		$data = $this->to_array();
+		unset($data['id']);
 
-		foreach ($this->fields as $field => $definition) {
-			if (!isset($this->$field) and $this->$field != null) {
-				continue;
-			}
-
-			$data[$field] = $this->$field;
-		}
-
-		if (!db_update($this->table, $this->id, $data)) {
+		if (!static::$db->update(static::$table, $this->id, $data)) {
 			log_file("Une erreur est survenue lors de la tentative de sauvegarde du Model.");
 		}
 	}
 
 	public function delete(): void
 	{
-		if ($this->state === static::MODEL_DELETED) {
+		if ($this->state === self::MODEL_DELETED) {
 			log_file("Tentative de suppression d'un Model précédemment supprimé.");
 			return;
 		}
 
-		if (!db_delete($this->table, $this->id)) {
+		if (!static::$db->delete(static::$table, $this->id)) {
 			log_file("Une erreur est survenue lors de la tentative de suppression du Model.");
+		}
+		else {
+			$this->state = self::MODEL_DELETED;
 		}
 	}
 
-	public function find(int $id): ?Model
+	public function refresh(): void
 	{
-		return $this->first('id', $id);
+		$modelData = static::$db->fetch_by_column(static::$table, 'id', $this->id);
+		if ($modelData)
+		{
+			$this->parse_in_model($modelData[0]);
+		}
 	}
 
-	public function first(string $column, string $value): ?Model
+	public static function all(): ?array
 	{
-		$this->where($column, $value);
+		if (!empty(static::$table)) {
+			$rows = static::$db->fetch_table(static::$table);
+		}
 
-		if (empty($this->query)) {
+		if (!isset($rows) || !$rows)
+		{
 			return null;
 		}
 
-		return $this->get(0);
+		return array_map(function ($row) {
+			$instance = new static();
+			return $instance->parse_in_model($row);
+		}, $rows);
 	}
 
-	public function get(int $id): Model
+	public static function find(int $id): ?self
 	{
-		return $this->parse_in_model($this->query[$id]);
+		$instance = new static();
+		$rows = static::fetch('id', $id);
+
+		return $instance->parse_in_model($rows[0]);
 	}
 
-	public function where(string $column, string $value): int
+	public static function first(string $column, string $value): ?self
 	{
-		$this->query = db_fetch_data($this->table, $column, $value);
-		return !empty($this->query) ? count($this->query) : 0;
+		$instance = new static();
+		$rows = static::fetch($column, $value);
+
+		if (!$rows)
+		{
+			return null;
+		}
+
+		return $instance->parse_in_model($rows[0]);
 	}
 
-	public function all(): ?array
+	public static function where(string $column, string $value): ?array
 	{
-		return db_fetch_table($this->table);
+		$rows = static::fetch($column, $value);
+
+		if (!$rows)
+		{
+			return null;
+		}
+
+		return array_map(function ($row) {
+			$instance = new static();
+			return $instance->parse_in_model($row);
+		}, $rows);
 	}
 
-	public function parse_in_model(array $data): Model
+	protected static function fetch(string $column, string $value): ?array
 	{
-		foreach ($data as $field => $value) {
+		if (!empty(static::$table)) {
+			$rows = static::$db->fetch_by_column(static::$table, $column, $value);
+		}
+
+		if (!isset($rows) || !$rows)
+		{
+			return null;
+		}
+
+		return $rows;
+	}
+
+	protected function parse_in_model(array $data): self
+	{
+		foreach ($data as $field => $value)
+		{
 			$this->$field = $value;
 		}
 
 		return $this;
+	}
+
+	public function to_array(): array
+	{
+		$data = [];
+		foreach (static::$fields as $field => $value)
+		{
+			$data[$field] = $this->$field;
+		}
+		return $data;
 	}
 }

@@ -23,7 +23,8 @@
 	],
     "autoload": {
       "psr-4": {
-        "app\\": "app/"
+		  "app\\": "app/",
+		  "back\\": "back/"
       }
     },
 	"require": {

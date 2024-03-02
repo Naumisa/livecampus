@@ -1,11 +1,12 @@
 <?php
 
+use app\Models\Model;
 use app\Models\UserModel;
 
 /**
- * @return UserModel|null
+ * @return Model|null
  */
-function auth_user (): ?UserModel
+function auth_user (): ?Model
 {
 	if (isset($_SESSION['token']))
 	{
@@ -19,12 +20,11 @@ function auth_user (): ?UserModel
 
 /**
  * @param string $token
- * @return array|null
+ * @return Model|null
  */
-function get_user_with_token (string $token): ?UserModel
+function get_user_with_token (string $token): ?Model
 {
-	$user = new UserModel;
-	return $user->first('remember_token', $token);
+	return UserModel::first('remember_token', $token);
 }
 
 /**

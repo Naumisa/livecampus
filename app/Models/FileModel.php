@@ -4,9 +4,9 @@ namespace app\Models;
 
 class FileModel extends Model
 {
-	protected string $table = 'files';
+	protected static string $table = 'files';
 
-	protected array $fields = [
+	protected static array $fields = [
 		'id' => [
 			'type' => 'int',
 			'required' => false,
@@ -51,10 +51,9 @@ class FileModel extends Model
 		],
 	];
 
-	protected array $foreign_fields = [
+	protected static array $foreign_fields = [
 		'owner_id' => [
 			'refer_to' => 'users(id)',
-			'on_delete' => 'CASCADE',
 		],
 	];
 
@@ -63,10 +62,9 @@ class FileModel extends Model
 	public int $download_count = 0;
 	public int $owner_id = 0;
 
-	public function owner(): UserModel
+	public function owner(): Model
 	{
-		$user = new UserModel;
-		return $user->find($this->owner_id);
+		return UserModel::find($this->owner_id);
 	}
 
 	/**

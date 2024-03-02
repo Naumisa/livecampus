@@ -26,7 +26,7 @@ function routes_get_navigation(): array
 		'files/share/{id}/{email}' 	=> ['GET', 	"FileController@share", 				'file.share', 				1],
 		'files/shared' 				=> ['GET', 	"FileController@shared", 				'files.shared', 			1],
 
-		'admin/users'				=> ['GET', 	"UserController@show", 					'show-users', 				2],
+		'admin/users'				=> ['GET', 	"UserController@show_users", 			'show-users', 				2],
 		'admin/user/{id}'			=> ['GET', 	"UserController@show", 					'show-user', 				2],
 	];
 }
@@ -70,13 +70,24 @@ function get_route_parameters(string $request): bool
  * @param string $key La clé identifiant la route cible.
  * @return string L'URL de redirection.
  */
-function routes_go_to_route(string $key): string
+function routes_go_to_route(string $key, ?array $params = null): string
 {
 	$routes = routes_get_navigation();
 	$user = auth_user();
+
 	foreach ($routes as $route => $values) {
 		if ($values[2] === $key) {
 			if (isLoggedIn() && $user->role >= $values[3] - 1 || !isLoggedIn() && $values[3] === 0 ) {
+				if (isset($params))
+				{
+					foreach ($params as $param => $value) {
+						$route = str_replace("{", ":", $route);
+						$route = str_replace("}", ";$value", $route);
+					}
+
+					return "/$route";
+				}
+
 				return "/$route";
 			}
 		}

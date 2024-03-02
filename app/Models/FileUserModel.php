@@ -4,9 +4,9 @@ namespace app\Models;
 
 class FileUserModel extends Model
 {
-    protected string $table = 'file_user';
+    protected static string $table = 'file_user';
 
-    protected array $fields = [
+    protected static array $fields = [
         'user_id' => [
             'type' => 'int',
             'required' => true,
@@ -20,14 +20,15 @@ class FileUserModel extends Model
             'query' => 'INT',
         ],
     ];
-    protected array $foreign_fields = [
+    protected static array $foreign_fields = [
         'user_id' => [
             'refer_to' => 'users(id)',
-            'on_delete' => 'CASCADE',
         ],
         'file_id' => [
             'refer_to' => 'files(id)',
-            'on_delete' => 'CASCADE',
         ],
     ];
+
+	public int $user_id = 0;
+	public int $file_id = 0;
 }

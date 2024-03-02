@@ -1,26 +1,11 @@
-<?php
-// Source : https://stackoverflow.com/a/11860664
-function filesize_formatted(int $size): string
-{
-	$units = array('o', 'Ko', 'Mo', 'Go', 'To');
-	$power = $size > 0 ? floor(log($size, 1024)) : 0;
-	return number_format($size / pow(1024, $power), 2) . ' ' . $units[$power];
-}
-?>
-
 <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
     <div class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
         <div class="flex items-center flex-1 space-x-4">
-            <?php if (!empty($data['files'])) : ?>
-                <?php $files = $data['files']; ?>
-	            <h5>
-		            <span class="text-gray-500"><?= lang_get('dashboard.files_count') ?> :</span>
-		            <span class="dark:text-white"><?= count($files) ?></span>
-	            </h5>
-	            <h5>
-		            <span class="text-gray-500"><?= lang_get('dashboard.total_size') ?> :</span>
-		            <span class="dark:text-white"><?= filesize_formatted($data['disk_space']) ?></span>
-	            </h5>
+            <?php if (!empty($data['users']->query)) : ?>
+                <h5>
+                    <span class="text-gray-500"><?= lang_get('dashboard.files_count') ?> :</span>
+                    <span class="dark:text-white"><?= count($data['users']->query) ?></span>
+                </h5>
             <?php else : ?>
                 <h5 class="dark:text-white">Vous n'avez aucun fichier pour le moment.</h5>
             <?php endif; ?>
@@ -35,7 +20,7 @@ function filesize_formatted(int $size): string
         </div>
     </div>
 
-    <?php if (!empty($files)) : ?>
+    <?php if (!empty($data['users']->query)) : ?>
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -50,22 +35,26 @@ function filesize_formatted(int $size): string
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($files as $file) : ?>
-	                    <?php $extension = pathinfo($file->data['path'] . $file->name_random, PATHINFO_EXTENSION) ?>
+                    <?php $index = 0; ?>
+                    <?php foreach ($data['users']->query as $file) : ?>
+                        <?php $file = $data['files']->get($index); ?>
                         <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <th scope="row" class="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <?= str_replace(".$extension", '', $file->name_origine) ?>
+                                <?= $file->name_origine ?>
                             </th>
                             <td class="px-4 py-2">
                                 <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                                    .<?= $extension ?>
+                                    .<?=
+                                        // $file['extension']
+                                        pathinfo($data['user_storage_path'] . $file->name_random, PATHINFO_EXTENSION);
+                                        ?>
                                 </span>
                             </td>
                             <td class="px-4 py-2">
-                                <?= filesize_formatted(filesize($file->data['path'] . $file->name_random)) ?>
+                                <?= filesize($data['user_storage_path'] . $file->name_random) ?> Mo
                             </td>
                             <td class="px-4 py-2"><?= $file->download_count . " " . lang_get('file_info.count') ?></td>
-                            <td class="px-4 py-2"><?= $file->data['owner_email'] ?? auth_user()->email ?></td>
+                            <td class="px-4 py-2"><?= auth_user()->email ?></td>
                             <td class="px-4 py-2"><?= $file->updated_at ?></td>
                             <td class="px-4 py-2">
                                 <div class="flex items-center space-x-2">
@@ -74,16 +63,15 @@ function filesize_formatted(int $size): string
                                             <?= lang_get('file_info.action_share') ?>
                                         </span>
                                     </a>
-	                                <?php if ($file->owner_id === auth_user()->id): ?>
-                                    <a href="<?= routes_go_to_route('file.delete', ['id' => $file->id]) ?>" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-red-500 hover:bg-red-600 group hover:shadow dark:bg-red-800 dark:hover:bg-red-700 dark:text-white">
+                                    <a href="<?= routes_go_to_route('file/delete') ?>" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-red-500 hover:bg-red-600 group hover:shadow dark:bg-red-800 dark:hover:bg-red-700 dark:text-white">
                                         <span class="flex-1 ms-3 whitespace-nowrap">
                                             <?= lang_get('file_info.action_delete') ?>
                                         </span>
                                     </a>
-	                                <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
+                        <?php $index++;  ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>

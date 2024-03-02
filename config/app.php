@@ -57,7 +57,6 @@ app_get_environment();
 
 // Chargement des fichiers de configuration spécifiques à l'application
 $configs = [
-	'database',
 	'auth',
 	'routes',
 	'languages',
@@ -68,31 +67,24 @@ foreach ($configs as $config) {
 	require_once("../config/$config.php");
 }
 
-// Création automatique de la table et d'un utilisateur admin.
-$auto_user = new UserModel;
+// Création automatique des tables et d'un utilisateur admin.
+$auto_user = new UserModel();
 $auto_user->migrate();
 
-if ($auto_user->find(1) == null) {
+$auto_file = new FileModel();
+$auto_file->migrate();
+
+$auto_file_user = new FileUserModel();
+$auto_file_user->migrate();
+
+/*if ($auto_user->find(1) == null) {
 	$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
 	$auto_user->create($userArray);
-}
-
-$auto_file = new FileModel;
-//$auto_file->migrate();
-
-$auto_fileUser = new FileUserModel;
-//$auto_fileUser->migrate();
-
-include_once(app_get_path('models') . "FileModel.php");
-
-//file_migrate();
-// END-TODO
+}*/
 
 // Initialisation du système de liens de navigation selon le statut d'authentification
 $loggedOutLinks = [
 	'home' => 'navigation.home',
-	//'services' => 'navigation.services',
-	//'contact' => 'navigation.contact',
 	'login' => 'navigation.login',
 	'register' => 'navigation.register',
 ];

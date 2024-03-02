@@ -6,9 +6,9 @@ use Random\RandomException;
 
 class UserModel extends Model
 {
-	protected string $table = 'users';
+	protected static string $table = 'users';
 
-	protected array $fields = [
+	protected static array $fields = [
 		'id' => [
 			'type' => 'int',
 			'required' => false,
@@ -58,6 +58,7 @@ class UserModel extends Model
 			'query' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
 		],
 	];
+	protected static array $foreign_fields = [];
 
 	public string $username = '';
 	public string $email = '';
@@ -65,12 +66,12 @@ class UserModel extends Model
 	public ?string $remember_token = '';
 	public int $role = 0;
 
-	public function create(array $data): void
+	public static function create(array $data): Model
 	{
 		$data['username'] = explode('@', $data['email'])[0];
 		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
 
-		parent::create($data);
+		return parent::create($data);
 	}
 
 	/**
@@ -116,28 +117,44 @@ class UserModel extends Model
 	}
 
 	/**
-	 * @return array Returns the informations of the user's files.
+	 * @return array|null Returns the informations of the user's files.
 	 */
-	function files(): ?FileModel
+	function files(): ?array
 	{
-		$files = new FileModel;
-		if ($files->where('owner_id', $this->id) > 0) {
+		$files = FileModel::where('owner_id', $this->id);
+
+		if (!empty($files) > 0) {
+			foreach ($files as $file)
+			{
+				$file->data['path'] = $this->storage_path();
+			}
+
 			return $files;
 		}
+
 		return null;
 	}
-	function sharedFiles(): ?FileUserModel
+
+	function sharedFiles(): ?array
 	{
-		$filesUsers = new FileUserModel;
-		if ($filesUsers->where('user_id', $this->id) > 0) {
-			$data = [];
-			foreach ($filesUsers->query as $ownerId => $fileId) {
-				$file = new FileModel;
-				$file->find($fileId);
-				//$data[]= ;
+		$filesUsers = FileUserModel::where('user_id', auth_user()->id);
+		$files = [];
+
+		if (!empty($filesUsers) > 0) {
+			foreach ($filesUsers as $fileUser)
+			{
+				$file_id = $fileUser->file_id;
+				$file = FileModel::find($file_id);
+				$owner_id = $file->owner_id;
+				$owner = UserModel::find($owner_id);
+				$file->data['path'] = $owner->storage_path();
+				$file->data['owner_email'] = $owner->email;
+				$files[] = $file;
 			}
-			return $filesUsers;
+
+			return $files;
 		}
+
 		return null;
 	}
 }

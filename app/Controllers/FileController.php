@@ -91,6 +91,7 @@ function delete(): array
 {
     // Récupère l'ID du fichier dont la suppression a été demandée
     $fileId = routes_get_params('id');
+
     // Récupère l'ID de l'utilisateur qui à créer le fichier
     // doit vérifier si le fichier appartient bien à l'utilisateur connecté
     $user = auth_user();
@@ -98,9 +99,8 @@ function delete(): array
     // Chemin du fichier
     $targetDir = $user->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
-    $file = new FileModel;
     // cherche le fichier avec l'id $fileId
-    $file->find($fileId);
+    $file = FileModel::find($fileId);
     $fileUserId = $file->owner_id;
     if ($fileUserId === $userId) {
         unlink($targetDir . $file->name_random);
@@ -167,6 +167,17 @@ function shared(): array
 	$user = auth_user();
 	$data['files'] = $user->sharedFiles();
 	$data['user_storage_path'] = $user->storage_path();
+
+	if (!empty($data['files']) > 0) {
+		$disk_space = 0;
+
+		foreach ($data['files'] as $file)
+		{
+			$disk_space += filesize($file->data['path'] . $file->name_random);
+		}
+
+		$data['disk_space'] = $disk_space;
+	}
 
 	return [
 		'data' => $data,

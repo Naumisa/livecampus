@@ -29,6 +29,25 @@ function show(): array
 }
 
 /**
+ * Affiche le profil d'un utilisateur spécifique par son ID.
+ *
+ * @return array Retourne les données de l'utilisateur et la vue associée.
+ */
+function show_users(): array
+{
+	$data = [];
+
+	$users = UserModel::all();
+
+	$data['users'] = $users;
+
+	return [
+		'data' => $data,
+		'view' => "admin/users",
+	];
+}
+
+/**
  * Prépare les données pour la vue du tableau de bord de l'utilisateur.
  *
  * @return array Retourne un tableau avec les données et la vue du tableau de bord.
@@ -38,6 +57,17 @@ function dashboard(): array
 	$user = auth_user();
 	$data['files'] = $user->files();
 	$data['user_storage_path'] = $user->storage_path();
+
+	if (!empty($data['files']) > 0) {
+		$disk_space = 0;
+
+		foreach ($data['files'] as $file)
+		{
+			$disk_space += filesize($file->data['path'] . $file->name_random);
+		}
+
+		$data['disk_space'] = $disk_space;
+	}
 
 	return [
 		'data' => $data,
@@ -144,8 +174,7 @@ function login_attempt(): array
 
 	$result = [];
 	if ($isValid) {
-		$user = new UserModel;
-		$user = $user->first('email', $data['user_email']);
+		$user = UserModel::first('email', $data['user_email']);
 
 		if ($user != null)
 		{
