@@ -1,87 +1,68 @@
+<?php
+$roles = [
+	'user',
+	'admin'
+]
+?>
+
 <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
     <div class="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
         <div class="flex items-center flex-1 space-x-4">
-            <?php if (!empty($data['users']->query)) : ?>
-                <h5>
-                    <span class="text-gray-500"><?= lang_get('dashboard.files_count') ?> :</span>
-                    <span class="dark:text-white"><?= count($data['users']->query) ?></span>
-                </h5>
-            <?php else : ?>
-                <h5 class="dark:text-white">Vous n'avez aucun fichier pour le moment.</h5>
-            <?php endif; ?>
-        </div>
-        <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
-            <button data-modal-target="upload-modal" data-modal-toggle="upload-modal" type="button" class="flex items-center justify-center flex-shrink-0 px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
-                </svg>
-                <?= lang_get('dashboard.file_upload') ?>
-            </button>
+            <h5>
+                <span class="text-gray-500"><?= lang_get('show-users.users_count') ?> :</span>
+                <span class="dark:text-white"><?= count($data['users']) - 1 ?></span>
+            </h5>
         </div>
     </div>
 
-    <?php if (!empty($data['users']->query)) : ?>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.name') ?></th>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.type') ?></th>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.size') ?></th>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.downloaded_count') ?></th>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.owner') ?></th>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.last_updated') ?></th>
-                        <th scope="col" class="px-4 py-3"><?= lang_get('file_info.actions') ?></th>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-4 py-3"><?= lang_get('show-users.username') ?></th>
+                    <th scope="col" class="px-4 py-3"><?= lang_get('show-users.email') ?></th>
+	                <th scope="col" class="px-4 py-3"><?= lang_get('show-users.role') ?></th>
+                    <th scope="col" class="px-4 py-3"><?= lang_get('show-users.created_at') ?></th>
+                    <th scope="col" class="px-4 py-3"><?= lang_get('show-users.last_updated') ?></th>
+                    <th scope="col" class="px-4 py-3"><?= lang_get('show-users.actions') ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($data['users'] as $user) : ?>
+                    <?php if ($user->id === auth_user()->id) continue; ?>
+                    <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <th scope="row" class="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            <?= $user->username ?>
+                        </th>
+	                    <td class="px-4 py-2">
+                            <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
+                                <?= $user->email ?>
+                            </span>
+	                    </td>
+                        <td class="px-4 py-2">
+                            <?= lang_get("show-users.role_" . $roles[$user->role]) ?>
+                        </td>
+                        <td class="px-4 py-2"><?= $user->created_at ?></td>
+                        <td class="px-4 py-2"><?= $user->updated_at ?></td>
+                        <td class="px-4 py-2">
+                            <div class="flex items-center space-x-2">
+                                <a href="<?= routes_go_to_route('user/delete') ?>" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-red-500 hover:bg-red-600 group hover:shadow dark:bg-red-800 dark:hover:bg-red-700 dark:text-white">
+                                    <span class="flex-1 ms-3 whitespace-nowrap">
+                                        <?= lang_get('show-users.action_delete') ?>
+                                    </span>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <?php $index = 0; ?>
-                    <?php foreach ($data['users']->query as $file) : ?>
-                        <?php $file = $data['files']->get($index); ?>
-                        <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <th scope="row" class="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <?= $file->name_origine ?>
-                            </th>
-                            <td class="px-4 py-2">
-                                <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                                    .<?=
-                                        // $file['extension']
-                                        pathinfo($data['user_storage_path'] . $file->name_random, PATHINFO_EXTENSION);
-                                        ?>
-                                </span>
-                            </td>
-                            <td class="px-4 py-2">
-                                <?= filesize($data['user_storage_path'] . $file->name_random) ?> Mo
-                            </td>
-                            <td class="px-4 py-2"><?= $file->download_count . " " . lang_get('file_info.count') ?></td>
-                            <td class="px-4 py-2"><?= auth_user()->email ?></td>
-                            <td class="px-4 py-2"><?= $file->updated_at ?></td>
-                            <td class="px-4 py-2">
-                                <div class="flex items-center space-x-2">
-                                    <a href="<?= routes_go_to_route('file/share') ?>" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
-                                        <span class="flex-1 ms-3 whitespace-nowrap">
-                                            <?= lang_get('file_info.action_share') ?>
-                                        </span>
-                                    </a>
-                                    <a href="<?= routes_go_to_route('file/delete') ?>" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-red-500 hover:bg-red-600 group hover:shadow dark:bg-red-800 dark:hover:bg-red-700 dark:text-white">
-                                        <span class="flex-1 ms-3 whitespace-nowrap">
-                                            <?= lang_get('file_info.action_delete') ?>
-                                        </span>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php $index++;  ?>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    <?php endif; ?>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
     <nav class="flex flex-col items-start justify-between p-4 space-y-3 md:flex-row md:items-center md:space-y-0" aria-label="Table navigation">
         <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
-            <?= lang_get('dashboard.showing') ?>
+            <?= lang_get('show-users.showing') ?>
             <span class="font-semibold text-gray-900 dark:text-white">1-10</span>
-            <?= lang_get('dashboard.showing_of') ?>
+            <?= lang_get('show-users.showing_of') ?>
             <span class="font-semibold text-gray-900 dark:text-white">1000</span>
         </span>
         <ul class="inline-flex items-stretch -space-x-px">

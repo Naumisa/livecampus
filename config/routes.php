@@ -77,7 +77,7 @@ function routes_go_to_route(string $key, ?array $params = null): string
 
 	foreach ($routes as $route => $values) {
 		if ($values[2] === $key) {
-			if (isLoggedIn() && $user->role >= $values[3] - 1 || !isLoggedIn() && $values[3] === 0 ) {
+			if (isLoggedIn() && $user->role >= $values[3] - 1 && $values[3] !== 0 || !isLoggedIn() && $values[3] === 0 ) {
 				if (isset($params))
 				{
 					foreach ($params as $param => $value) {
@@ -173,15 +173,23 @@ function routes_get_view(): void
 
 	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $method;
 
-	if (!$isGoodRequest) {
-		log_file("Erreur dans la récupération des informations de la route demandée : l'utilisateur n'a pas les accès requis.");
-		die();
-	}
-
 	if (!isLoggedIn() && $authLevel !== 0) {
 		$route = routes_get_route('home');
 		$controller = explode('@', $route[1]);
 		$route_name = $route[2];
+		$isGoodRequest = false;
+	}
+	elseif (isLoggedIn() && $authLevel === 0) {
+		$route = routes_get_route('dashboard');
+		$controller = explode('@', $route[1]);
+		$route_name = $route[2];
+		$isGoodRequest = false;
+	}
+
+	if (!$isGoodRequest) {
+		header("Location: " . routes_go_to_route($route[2]));
+		log_file("Erreur dans la récupération des informations de la route demandée : l'utilisateur n'a pas les accès requis.");
+		die();
 	}
 
 	$path = app_get_path('controllers');

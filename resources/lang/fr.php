@@ -85,5 +85,18 @@ return [
 	'profile.title' => 'Vos informations',
 	'profile.edit.title' => 'Vos informations',
 
-	'show-user.title' => 'Admin > Fiche utilisateur (%s)',
+	'show-users.title' => 'Admin > Utilisateur',
+	'show-users.users_count' => 'Nombre d\'utilisateurs inscris',
+	'show-users.showing' => 'Affichage',
+	'show-users.showing_of' => 'sur',
+
+	'show-users.username' => 'Nom d\'utilisateur',
+	'show-users.email' => 'Adresse e-mail',
+	'show-users.role' => 'Droits',
+	'show-users.created_at' => 'Créé le',
+	'show-users.last_updated' => 'Mise à jour le',
+	'show-users.actions' => 'Actions',
+	'show-users.action_delete' => 'Supprimer',
+	'show-users.role_user' => 'Utilisateur',
+	'show-users.role_admin' => 'Administrateur',
 ];
