@@ -22,7 +22,7 @@ function filesize_formatted(int $size): string
 		            <span class="dark:text-white"><?= filesize_formatted($data['disk_space']) ?></span>
 	            </h5>
             <?php else : ?>
-                <h5 class="dark:text-white">Vous n'avez aucun fichier pour le moment.</h5>
+                <h5 class="dark:text-white"><?= lang_get('dashboard.no_file') ?></h5>
             <?php endif; ?>
         </div>
         <div class="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">

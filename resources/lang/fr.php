@@ -40,6 +40,7 @@ return [
 	'dashboard.showing' => 'Affichage',
 	'dashboard.showing_of' => 'sur',
 	'dashboard.share_to' => 'Destinataire',
+	'dashboard.no_file' => "Vous n'avez aucun fichier pour le moment.",
 
 	// Page de Téléversement
 	'file.title' => 'Téléverser',
