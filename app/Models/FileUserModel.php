@@ -2,6 +2,11 @@
 
 namespace app\Models;
 
+/**
+ * Modèle pour la table d'association `file_user` qui gère les relations many-to-many entre les fichiers et les utilisateurs.
+ * Cette classe permet de représenter et manipuler les relations qui définissent quels utilisateurs ont accès à quels fichiers.
+ * Elle inclut des références aux identifiants des utilisateurs et des fichiers pour faciliter la gestion des droits d'accès.
+ */
 class FileUserModel extends Model
 {
     protected static string $table = 'file_user';
@@ -10,13 +15,13 @@ class FileUserModel extends Model
         'user_id' => [
             'type' => 'int',
             'required' => true,
-            'unique' => true,
+            'unique' => false,
             'query' => 'INT',
         ],
         'file_id' => [
             'type' => 'int',
             'required' => true,
-            'unique' => true,
+            'unique' => false,
             'query' => 'INT',
         ],
     ];

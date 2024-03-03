@@ -57,7 +57,7 @@ return [
 	'file_info.action_share' => 'Partager',
 	'file_info.action_delete' => 'Supprimer',
 
-	'file_upload.action_description' => 'Cliquez ou Glissez-Déposez pour téléverser',
+	'file_upload.action_description' => 'Cliquez pour téléverser',
 	'file_upload.upload_types' => 'Non acceptés: { .php }',
 	'file_upload.upload_max_size' => 'Taille maximum: 20 Mo',
 	'file_upload.send' => 'Envoyer',

@@ -1,11 +1,15 @@
 <?php
 
 use app\Models\UserModel;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
- * Affiche le profil d'un utilisateur spécifique par son ID.
+ * Affiche le profil d'un utilisateur spécifique identifié par son ID. Cette fonction récupère
+ * l'ID de l'utilisateur à partir des paramètres de la route, recherche l'utilisateur dans la base
+ * de données, et prépare les données de l'utilisateur pour la vue de profil.
  *
- * @return array Retourne les données de l'utilisateur et la vue associée.
+ * @return array Retourne un tableau associatif contenant les données de l'utilisateur (`'user'`)
+ *               et le nom de la vue associée (`"user/profile"`).
  */
 function show(): array
 {
@@ -29,9 +33,11 @@ function show(): array
 }
 
 /**
- * Affiche le profil d'un utilisateur spécifique par son ID.
+ * Récupère et affiche une liste de tous les utilisateurs enregistrés. Cette fonction est
+ * utilisée pour afficher tous les utilisateurs dans l'interface d'administration.
  *
- * @return array Retourne les données de l'utilisateur et la vue associée.
+ * @return array Retourne un tableau associatif contenant la liste des utilisateurs (`'users'`)
+ *               et le nom de la vue associée (`"admin/users"`).
  */
 function show_users(): array
 {
@@ -48,9 +54,12 @@ function show_users(): array
 }
 
 /**
- * Prépare les données pour la vue du tableau de bord de l'utilisateur.
+ * Prépare et affiche le tableau de bord de l'utilisateur authentifié. Cette fonction récupère
+ * les fichiers de l'utilisateur, calcule l'espace disque utilisé, et prépare les données pour la vue du tableau de bord.
  *
- * @return array Retourne un tableau avec les données et la vue du tableau de bord.
+ * @return array Retourne un tableau associatif contenant les fichiers de l'utilisateur (`'files'`),
+ *               le chemin de stockage des fichiers (`'user_storage_path'`), l'espace disque utilisé (`'disk_space'`),
+ *               et le nom de la vue du tableau de bord (`"user/dashboard"`).
  */
 function dashboard(): array
 {
@@ -76,9 +85,11 @@ function dashboard(): array
 }
 
 /**
- * Affiche le profil de l'utilisateur actuellement authentifié.
+ * Affiche le profil de l'utilisateur actuellement authentifié. Cette fonction récupère les données
+ * de l'utilisateur authentifié et prépare les données pour la vue de profil.
  *
- * @return array Retourne les données de l'utilisateur authentifié et la vue de profil.
+ * @return array Retourne un tableau associatif contenant les données de l'utilisateur (`'user'`)
+ *               et le nom de la vue associée (`"user/profile"`).
  */
 function profile(): array
 {
@@ -91,12 +102,15 @@ function profile(): array
 }
 
 /**
- * Traite la soumission du formulaire de mise à jour du profil de l'utilisateur.
- * Met à jour les informations de l'utilisateur dans la base de données si elles sont modifiées.
+ * Traite la soumission du formulaire de mise à jour du profil de l'utilisateur. Vérifie et met à jour
+ * les informations de l'utilisateur dans la base de données. Gère également la validation du mot de passe et
+ * la confirmation du mot de passe.
  *
- * @return array Retourne les données mises à jour de l'utilisateur et redirige vers la vue de profil.
+ * @return void Redirige vers la vue de profil après la mise à jour des informations de l'utilisateur.
+ *               Les messages de session peuvent être utilisés pour indiquer le succès ou les erreurs.
+ * @throws Exception Si une erreur survient lors de la mise à jour des informations de l'utilisateur.
  */
-function edit() : array
+#[NoReturn] function edit() : void
 {
 	# Get current user's datas
 	$user = auth_user();
@@ -159,9 +173,11 @@ function edit() : array
 }
 
 /**
- * Prépare la vue de connexion pour l'utilisateur.
+ * Prépare la vue de connexion pour l'utilisateur. Cette fonction est appelée pour afficher
+ * le formulaire de connexion.
  *
- * @return array Retourne les données nécessaires et la vue de connexion.
+ * @return array Retourne un tableau associatif vide (`'data'`) et le nom de la vue de connexion
+ *               (`"user/auth/login"`), car aucune donnée préalable n'est nécessaire pour cette vue.
  */
 function login(): array
 {
@@ -174,13 +190,15 @@ function login(): array
 }
 
 /**
- * Traite la tentative de connexion de l'utilisateur.
- * Vérifie les identifiants, met à jour le token de l'utilisateur en cas de succès, et redirige vers le profil.
+ * Traite la tentative de connexion de l'utilisateur. Vérifie les identifiants soumis, met à jour le token
+ * de l'utilisateur en cas de succès, et redirige vers le profil de l'utilisateur ou retourne à la page de connexion
+ * en cas d'échec.
  *
- * @return array Retourne les erreurs rencontrées ou redirige l'utilisateur en cas de succès.
- * @throws Exception En cas d'échec de génération de tokens aléatoires.
+ * @return void En cas de succès, redirige l'utilisateur vers son profil. En cas d'échec, redirige vers la page de
+ *               connexion avec un message d'erreur approprié.
+ * @throws Exception En cas d'échec de la génération de tokens aléatoires.
  */
-function login_attempt(): array
+#[NoReturn] function login_attempt(): void
 {
 	$fields = ["user_email", "user_password"];
 	$isValid = true;
@@ -217,32 +235,31 @@ function login_attempt(): array
 
 			header('Location: /user/login');
 			log_session("Le mot de passe ne correspond pas.");
+			die();
 		}
 		else
 		{
 			header('Location: /user/login');
 			log_session("Aucun utilisateur n'existe pour cette adresse e-mail.");
+			die();
 		}
 	}
 	else
 	{
 		header('Location: /user/login');
 		log_session($error);
+		die();
 	}
-
-	return [
-		'data' => $result,
-		'view' => "user/auth/login",
-	];
 }
 
 /**
- * Déconnecte l'utilisateur.
- * Efface le token de l'utilisateur de la session et de la base de données, puis redirige.
+ * Déconnecte l'utilisateur en effaçant son token de la session et de la base de données, puis redirige
+ * vers la page d'accueil.
  *
- * @return array Retourne les données nécessaires pour la vue après déconnexion.
+ * @return void Cette fonction ne retourne pas de tableau mais effectue une redirection vers la page d'accueil
+ *              après déconnexion.
  */
-function logout(): array
+#[NoReturn] function logout(): void
 {
 	$user = auth_user();
 	$user->remember_token = null;
@@ -256,9 +273,11 @@ function logout(): array
 }
 
 /**
- * Prépare la vue d'enregistrement pour un nouvel utilisateur.
+ * Prépare la vue d'enregistrement pour un nouvel utilisateur. Cette fonction est appelée pour afficher
+ * le formulaire d'enregistrement.
  *
- * @return array Retourne les données nécessaires et la vue d'enregistrement.
+ * @return array Retourne un tableau associatif vide (`'data'`) et le nom de la vue d'enregistrement
+ *               (`"user/auth/register"`), car aucune donnée préalable n'est nécessaire pour cette vue.
  */
 function register(): array
 {
@@ -271,13 +290,15 @@ function register(): array
 }
 
 /**
- * Traite la tentative d'enregistrement d'un nouvel utilisateur.
- * Vérifie la validité des données soumises, crée le nouvel utilisateur si possible, et redirige vers le profil.
+ * Traite la tentative d'enregistrement d'un nouvel utilisateur. Vérifie la validité des données soumises,
+ * crée le nouvel utilisateur si possible, et redirige vers le profil de l'utilisateur ou retourne à la page
+ * d'enregistrement en cas d'échec.
  *
- * @return array Retourne les erreurs rencontrées ou redirige l'utilisateur en cas de succès.
- * @throws Exception En cas d'échec de génération de tokens aléatoires.
+ * @return void En cas de succès, redirige l'utilisateur vers son profil. En cas d'échec, redirige vers la page d'enregistrement
+ *               avec un message d'erreur approprié.
+ * @throws Exception En cas d'échec de la génération de tokens aléatoires.
  */
-function register_attempt(): array
+#[NoReturn] function register_attempt(): void
 {
 	$fields = ["user_email", "user_password", "user_password_confirmation"];
 	$isValid = true;
@@ -299,6 +320,7 @@ function register_attempt(): array
 		header('Location: /user/register');
 		log_session("Le champ confirmation ne correspond pas au mot de passe entré.");
 		$isValid = false;
+		die();
 	}
 
 	$result = [];
@@ -328,16 +350,13 @@ function register_attempt(): array
 		{
 			header('Location: /user/register');
 			log_session("Un autre utilisateur existe déjà pour cette adresse e-mail.");
+			die();
 		}
 	}
 	else
 	{
 		header('Location: /user/register');
 		log_session($error);
+		die();
 	}
-
-	return [
-		'data' => $result,
-		'view' => "user/auth/register",
-	];
 }

@@ -8,8 +8,10 @@ use back\Models\DatabaseModel;
 
 /**
  * Récupère le chemin d'accès spécifié à partir d'un ensemble prédéfini de chemins.
- * @param string $key Clé identifiant le chemin d'accès souhaité.
- * @return string Le chemin d'accès correspondant à la clé.
+ * Utile pour accéder à différentes ressources de l'application en fournissant une clé descriptive.
+ *
+ * @param string $key Clé identifiant le chemin d'accès souhaité parmi les chemins prédéfinis.
+ * @return string Le chemin d'accès absolu correspondant à la clé fournie.
  */
 function app_get_path(string $key): string
 {
@@ -26,7 +28,10 @@ function app_get_path(string $key): string
 }
 
 /**
- * Charge les variables d'environnement depuis un fichier .env pour une configuration centralisée.
+ * Charge les variables d'environnement depuis un fichier .env pour une configuration centralisée de l'application.
+ * Permet de définir des paramètres tels que les informations de connexion à la base de données, les chemins de ressources,
+ * et d'autres variables d'environnement essentielles au fonctionnement de l'application.
+ *
  * @return void
  */
 function app_get_environment(): void
@@ -55,9 +60,43 @@ function app_get_environment(): void
 	}
 }
 
+/**
+ * Initialise la base de données en désactivant temporairement la vérification des clés étrangères,
+ * migre les modèles de données pour créer les tables nécessaires si elles n'existent pas déjà,
+ * et crée un utilisateur administrateur par défaut si aucun utilisateur n'est présent.
+ *
+ * @return void
+ */
+function app_auto_creation(): void
+{
+	$pdo = new DatabaseModel;
+	$pdo->set_foreign_key_check(false);
+
+	$auto_user = new UserModel();
+	$auto_user->migrate();
+
+	$auto_folder = new FolderModel();
+	$auto_folder->migrate();
+
+	$auto_file = new FileModel();
+	$auto_file->migrate();
+
+	$auto_file_user = new FileUserModel();
+	$auto_file_user->migrate();
+
+	$pdo->set_foreign_key_check(true);
+
+	if (!UserModel::find(1)) {
+		$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
+		$auto_user->create($userArray);
+	}
+}
+
+// Initialisation de l'environnement
 app_get_environment();
 
-// Chargement des fichiers de configuration spécifiques à l'application
+// Chargement des fichiers de configuration.
+// Cela inclut la configuration de l'authentification, des routes, des langues, et du système de logs.
 $configs = [
 	'auth',
 	'routes',
@@ -69,30 +108,8 @@ foreach ($configs as $config) {
 	require_once("../config/$config.php");
 }
 
-// Création automatique des tables et d'un utilisateur admin.
-$pdo = new DatabaseModel;
-$pdo->set_foreign_key_check(false);
+app_auto_creation();
 
-$auto_user = new UserModel();
-$auto_user->migrate();
-
-$auto_folder = new FolderModel();
-$auto_folder->migrate();
-
-$auto_file = new FileModel();
-$auto_file->migrate();
-
-$auto_file_user = new FileUserModel();
-$auto_file_user->migrate();
-
-$pdo->set_foreign_key_check(true);
-
-if (!UserModel::find(1)) {
-	$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
-	$auto_user->create($userArray);
-}
-
-// Initialisation du système de liens de navigation selon le statut d'authentification
 $loggedOutLinks = [
 	'home' => 'navigation.home',
 	'login' => 'navigation.login',

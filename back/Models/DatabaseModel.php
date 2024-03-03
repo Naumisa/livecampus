@@ -6,12 +6,19 @@ use Exception;
 use PDO;
 use PDOException;
 
+/**
+ * Fournit une interface pour interagir avec la base de données.
+ * Cette classe encapsule la connexion à la base de données et offre des méthodes pour effectuer
+ * des opérations CRUD (Création, Lecture, Mise à jour, Suppression) sur les tables de la base de données.
+ */
 class DatabaseModel
 {
 	private PDO $pdo;
 
 	/**
-	 * @throws Exception
+	 * Initialise une nouvelle instance de DatabaseModel et établit une connexion à la base de données.
+	 *
+	 * @throws Exception Si la connexion à la base de données échoue.
 	 */
 	public function __construct()
 	{
@@ -19,7 +26,10 @@ class DatabaseModel
 	}
 
 	/**
-	 * @throws Exception
+	 * Établit une connexion à la base de données en utilisant les paramètres spécifiés dans les variables d'environnement.
+	 * Configure PDO pour lancer des exceptions en cas d'erreur et pour retourner les résultats sous forme de tableau associatif.
+	 *
+	 * @throws Exception Si la connexion à la base de données échoue.
 	 */
 	public function connect(): void
 	{
@@ -231,6 +241,12 @@ class DatabaseModel
 		}
 	}
 
+	/**
+	 * Active ou désactive la vérification des contraintes de clé étrangère.
+	 * Utile pour désactiver temporairement les contraintes lors de l'initialisation de la base de données ou lors de tests.
+	 *
+	 * @param bool $value True pour activer la vérification, False pour la désactiver.
+	 */
 	public function set_foreign_key_check(bool $value): void
 	{
 		$value = (int) $value;

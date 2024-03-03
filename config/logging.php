@@ -3,6 +3,7 @@
 /**
  * Enregistre un message dans le fichier de log.
  * Effectue une rotation des logs lorsque la taille du fichier a atteint 1MB.
+ *
  * @param string $message Le message à loguer.
  * @return void
  */
@@ -31,6 +32,7 @@ function log_file (string $message): void
 
 /**
  * Enregistre un message d'erreur pour l'affichage ultérieur.
+ *
  * @param string $message Le message d'erreur à enregistrer.
  * @return void
  */
@@ -45,6 +47,7 @@ function log_session (string $message): void
 
 /**
  * Vérifie si des erreurs ont été enregistrées.
+ *
  * @return bool Retourne true s'il y a des erreurs, false sinon.
  */
 function has_error (): bool
@@ -54,6 +57,7 @@ function has_error (): bool
 
 /**
  * Récupère les messages d'erreur enregistrés.
+ *
  * @return array Retourne un tableau des messages d'erreur.
  */
 function get_errors (): array

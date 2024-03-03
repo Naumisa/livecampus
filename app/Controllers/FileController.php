@@ -3,11 +3,16 @@
 use app\Models\FileModel;
 use app\Models\FileUserModel;
 use app\Models\UserModel;
+use JetBrains\PhpStorm\NoReturn;
 
 /**
- * Fonction de contrôleur pour gérer l'envoi des fichiers.
+ * Gère l'envoi des fichiers par les utilisateurs. Cette fonction traite le fichier reçu via un formulaire d'envoi,
+ * vérifie l'extension et la taille du fichier pour s'assurer qu'ils respectent les critères définis,
+ * déplace le fichier vers un répertoire de stockage dédié et enregistre ses informations dans la base de données.
+ * Si le fichier est correctement traité, l'utilisateur est redirigé vers son tableau de bord.
  *
- * @return array Données et vue à afficher.
+ * @return array Retourne un tableau associatif contenant les données à afficher et le nom de la vue pour l'affichage.
+ * @throws Exception Si le fichier n'a pas pu être téléchargé pour une raison quelconque.
  */
 function upload(): array
 {
@@ -81,7 +86,14 @@ function upload(): array
     ];
 }
 
-function download()
+/**
+ * Permet aux utilisateurs de télécharger des fichiers. Cette fonction vérifie si l'utilisateur actuel
+ * a les droits nécessaires pour télécharger le fichier demandé. Si c'est le cas, elle initie le téléchargement
+ * du fichier en envoyant les en-têtes appropriés et le contenu du fichier.
+ *
+ * @throws Exception Si l'utilisateur n'a pas le droit de télécharger le fichier ou si un problème survient lors de l'envoi du fichier.
+ */
+#[NoReturn] function download(): void
 {
 	$fileId = routes_get_params('id');
 	$file = FileModel::find($fileId);
@@ -110,7 +122,12 @@ function download()
 }
 
 /**
- * @return array
+ * Supprime un fichier spécifié par l'ID de fichier passé en paramètre. Cette fonction vérifie d'abord
+ * si le fichier appartient à l'utilisateur actuel avant de procéder à sa suppression. Si le fichier est
+ * supprimé avec succès, l'utilisateur est redirigé vers son tableau de bord.
+ *
+ * @return array Retourne un tableau associatif contenant les données à afficher et le nom de la vue pour l'affichage.
+ * @throws Exception Si le fichier ne peut pas être supprimé ou si l'utilisateur n'a pas le droit de supprimer le fichier.
  */
 function delete(): array
 {
@@ -143,7 +160,14 @@ function delete(): array
     ];
 }
 
-function share(): array
+/**
+ * Partage un fichier avec un autre utilisateur spécifié par son adresse e-mail. Cette fonction récupère
+ * l'ID du fichier et l'adresse e-mail de l'utilisateur destinataire à partir des données du formulaire,
+ * vérifie si l'utilisateur destinataire existe, puis ajoute une entrée dans la table de partage de fichiers.
+ *
+ * @throws Exception Si l'e-mail fourni ne correspond à aucun utilisateur ou si le partage échoue pour une autre raison.
+ */
+#[NoReturn] function share(): void
 {
 	// recupere l'email saisie de l'utilisateur à qui partager le fichier
 	$userMail = filter_input(INPUT_POST, 'mail_to_share'); //paramettre a modifier en fonction du button
@@ -171,9 +195,11 @@ function share(): array
 }
 
 /**
- * Fonction de contrôleur pour gérer l'affichage des fichiers partagés.
+ * Affiche les fichiers partagés avec l'utilisateur actuel. Cette fonction récupère la liste des fichiers
+ * partagés avec l'utilisateur et calcule l'espace disque utilisé par ces fichiers.
  *
- * @return array Données et vue à afficher.
+ * @return array Retourne un tableau associatif contenant les données à afficher, y compris la liste des fichiers partagés,
+ * l'espace disque utilisé par ces fichiers, et le nom de la vue pour l'affichage.
  */
 function shared(): array
 {

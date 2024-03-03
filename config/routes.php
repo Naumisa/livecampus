@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Retourne la liste des routes disponibles avec leurs paramètres.
- * Chaque route est définie par son chemin, la méthode HTTP, le chemin du contrôleur,
- * le nom de la fonction à appeler, son appellation et si l'authentification est nécessaire.
- * @return array[] La configuration des routes.
+ * Définit et retourne la configuration des routes de l'application.
+ * Chaque route est mappée à un contrôleur et une méthode, avec des informations supplémentaires telles que la
+ * méthode HTTP attendue, le besoin d'authentification, et une appellation unique.
+ *
+ * @return array Configuration des routes avec leurs chemins, méthodes HTTP, contrôleurs, noms, et niveaux
+ *              d'authentification requis.
  */
 function routes_get_navigation(): array
 {
@@ -33,9 +35,11 @@ function routes_get_navigation(): array
 }
 
 /**
- * Extrait les paramètres d'une requête et les stocke dans $_REQUEST.
- * @param string $request La requête à analyser.
- * @return bool Retourne true si des paramètres ont été trouvés et traités, false sinon.
+ * Analyse une requête URL pour extraire les paramètres dynamiques et les stocke dans $_REQUEST.
+ * Les paramètres sont identifiés par des préfixes ':' dans les segments de l'URL.
+ *
+ * @param string $request La requête URL à analyser.
+ * @return bool True si des paramètres ont été extraits et stockés, false sinon.
  */
 function get_route_parameters(string $request): bool
 {
@@ -67,9 +71,12 @@ function get_route_parameters(string $request): bool
 
 
 /**
- * Redirige vers une route spécifique basée sur une clé donnée.
- * @param string $key La clé identifiant la route cible.
- * @return string L'URL de redirection.
+ * Construit une URL pour rediriger vers une route spécifique identifiée par sa clé.
+ * Peut inclure des paramètres dynamiques pour construire l'URL finale.
+ *
+ * @param string $key La clé de la route cible.
+ * @param array|null $params Paramètres optionnels pour la route.
+ * @return string L'URL construite pour la redirection.
  */
 function routes_go_to_route(string $key, ?array $params = null): string
 {
@@ -103,8 +110,10 @@ function routes_go_to_route(string $key, ?array $params = null): string
 }
 
 /**
- * Récupère le chemin de la page actuelle à partir de l'URL.
- * @return string Le chemin de la page actuelle.
+ * Extrait le chemin de la page actuelle de l'URL de la requête.
+ * Utile pour déterminer la route actuelle basée sur l'URL demandée.
+ *
+ * @return string Le chemin extrait de l'URL actuelle.
  */
 function routes_get_page(): string
 {
@@ -113,6 +122,12 @@ function routes_get_page(): string
 	return ltrim($page, '/');
 }
 
+/**
+ * Vérifie si la route actuelle correspond à une requête de type fichier.
+ * Utilisé pour distinguer les requêtes de fichiers des autres types de requêtes dans le système de routage.
+ *
+ * @return bool True si la route actuelle est de type 'FILE', false sinon.
+ */
 function routes_is_file(): bool
 {
 	$route = routes_get_route();
@@ -120,10 +135,11 @@ function routes_is_file(): bool
 }
 
 /**
- * Détermine la route actuelle en se basant sur l'URL demandée.
- * Si des paramètres sont présents dans l'URL, ils sont traités et stockés.
+ * Détermine et retourne la configuration de la route actuelle basée sur l'URL demandée.
+ * Traite également les paramètres dynamiques dans l'URL et les stocke pour un accès ultérieur.
+ *
  * @param string|null $request L'URL demandée, ou null pour utiliser l'URL actuelle.
- * @return array La configuration de la route correspondante.
+ * @return array Configuration de la route actuelle, incluant le contrôleur et la méthode à appeler.
  */
 function routes_get_route(string $request = null): array
 {
@@ -145,9 +161,9 @@ function routes_get_route(string $request = null): array
 }
 
 /**
- * Récupère le nom de la route actuelle.
+ * Récupère le nom de la route actuelle basée sur la configuration déterminée par routes_get_route().
  *
- * @return string Le nom de la route.
+ * @return string Le nom de la route actuelle.
  */
 function routes_get_route_name(): string
 {
@@ -155,7 +171,8 @@ function routes_get_route_name(): string
 }
 
 /**
- * Récupère un paramètre spécifique de la requête actuelle.
+ * Récupère une valeur de paramètre spécifique pour la requête actuelle, basée sur une clé.
+ * Les paramètres sont extraits et stockés par la fonction get_route_parameters().
  *
  * @param string $key La clé du paramètre à récupérer.
  * @return string|null La valeur du paramètre, ou null si non trouvé.
@@ -166,8 +183,10 @@ function routes_get_params(string $key): ?string
 }
 
 /**
- * Charge la vue correspondante à la route actuelle.
- * Gère l'authentification requise pour certaines routes et les erreurs de méthode HTTP.
+ * Charge et affiche la vue correspondante à la route actuelle.
+ * Vérifie l'authentification et les permissions requises pour accéder à la route,
+ * redirige en cas d'accès non autorisé, et inclut le fichier de vue approprié.
+ *
  * @return void
  */
 function routes_get_view(): void

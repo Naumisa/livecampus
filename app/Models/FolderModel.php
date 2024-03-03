@@ -2,6 +2,12 @@
 
 namespace app\Models;
 
+/**
+ * Modèle pour les dossiers stockés dans l'application.
+ * Cette classe gère les dossiers utilisés pour organiser les fichiers. Elle permet de créer, retrouver,
+ * et manipuler les informations relatives aux dossiers dans la base de données. Chaque dossier est unique
+ * et appartient à un utilisateur spécifique, identifié par `owner_id`.
+ */
 class FolderModel extends Model
 {
 	protected static string $table = 'folders';
@@ -62,11 +68,12 @@ class FolderModel extends Model
 	public int $owner_id = 0;
 
 	/**
-	 * Prépare un tableau avec les données d'un utilisateur pour insertion ou mise à jour,
-	 * en incluant le hachage du mot de passe.
-	 * @param string $name_origin
-	 * @param UserModel $user
-	 * @return array Le tableau des données de l'utilisateur.
+	 * Prépare et retourne un tableau de données pour la création ou la mise à jour d'un dossier,
+	 * basé sur le nom original du dossier et l'utilisateur propriétaire.
+	 *
+	 * @param string $name_origin Le nom original du dossier fourni par l'utilisateur.
+	 * @param UserModel $user L'instance du modèle de l'utilisateur propriétaire du dossier.
+	 * @return array Un tableau associatif contenant les données préparées du dossier.
 	 */
 	function fill(string $name_origin, UserModel $user): array
 	{
@@ -76,6 +83,17 @@ class FolderModel extends Model
 		];
 	}
 
+	/**
+	 * Crée un nouveau dossier dans la base de données avec un nom aléatoire unique,
+	 * en se basant sur les données fournies. Le dossier est physiquement créé sur le système de fichiers
+	 * dans le répertoire de stockage public. Le nom aléatoire est généré à partir de l'identifiant de l'utilisateur,
+	 * de son adresse email, et du nom original du dossier.
+	 *
+	 * @param array $data Un tableau associatif contenant les données nécessaires à la création du dossier,
+	 *                    incluant le nom original et l'utilisateur propriétaire.
+	 * @return Model|null Retourne une instance du modèle `FolderModel` représentant le dossier créé,
+	 *                     ou null en cas d'échec.
+	 */
 	public static function create(array $data): ?Model
 	{
 		$user = $data['user'];

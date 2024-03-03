@@ -2,9 +2,14 @@
 
 namespace app\Models;
 
-use back\Models\DatabaseModel;
 use Random\RandomException;
 
+/**
+ * Représente le modèle de données pour les utilisateurs dans l'application.
+ * Cette classe étend le modèle de base et inclut des méthodes spécifiques pour la gestion des utilisateurs,
+ * y compris la création d'utilisateurs, la génération de tokens d'authentification, et la récupération des dossiers
+ * et fichiers associés à un utilisateur.
+ */
 class UserModel extends Model
 {
 	protected static string $table = 'users';
@@ -73,6 +78,14 @@ class UserModel extends Model
 	public ?string $remember_token = '';
 	public int $role = 0;
 
+	/**
+	 * Crée une nouvelle instance de `UserModel` dans la base de données avec les données fournies.
+	 * Génère automatiquement un nom d'utilisateur à partir de l'email, hache le mot de passe, et crée un dossier
+	 * par défaut pour l'utilisateur.
+	 *
+	 * @param array $data Données pour créer un nouvel utilisateur.
+	 * @return UserModel|null Retourne une instance de `UserModel` si la création est réussie, sinon null.
+	 */
 	public static function create(array $data): ?Model
 	{
 		$data['username'] = explode('@', $data['email'])[0];
@@ -94,13 +107,14 @@ class UserModel extends Model
 	}
 
 	/**
-	 * Prépare un tableau avec les données d'un utilisateur pour insertion ou mise à jour,
-	 * en incluant le hachage du mot de passe.
+	 * Prépare un tableau avec les données d'un utilisateur pour l'insertion ou la mise à jour,
+	 * incluant le hachage du mot de passe.
+	 *
 	 * @param string $username Le nom d'utilisateur.
-	 * @param string $email L'email de l'utilisateur.
+	 * @param string $email L'adresse email de l'utilisateur.
 	 * @param string $password Le mot de passe de l'utilisateur (sera haché).
-	 * @param int $role Le rôle de l'utilisateur.
-	 * @return array Le tableau des données de l'utilisateur.
+	 * @param int $role Le rôle de l'utilisateur dans l'application.
+	 * @return array Un tableau associatif contenant les données de l'utilisateur.
 	 */
 	function fill(string $username, string $email, string $password, int $role): array
 	{
@@ -113,10 +127,12 @@ class UserModel extends Model
 	}
 
 	/**
-	 * Génère un sélecteur et un validateur pour un token.
-	 * Utile pour les fonctionnalités d'authentification ou de réinitialisation de mot de passe.
-	 * @return void Attribue un token généré sous forme 'sélecteur:validateur'.
-	 * @throws RandomException
+	 * Génère un token d'authentification pour l'utilisateur, composé d'un sélecteur et d'un validateur.
+	 * Ce token peut être utilisé pour des fonctionnalités telles que la réinitialisation du mot de passe ou la
+	 * persistance de la session utilisateur.
+	 *
+	 * @return void Attribue le token généré à la propriété `remember_token` de l'utilisateur.
+	 * @throws RandomException Si la génération de bytes aléatoires échoue.
 	 */
 	function generate_token(): void
 	{
@@ -127,7 +143,9 @@ class UserModel extends Model
 	}
 
 	/**
-	 * @return Model Returns the FolderModel of the user's files.
+	 * Récupère le dossier par défaut associé à l'utilisateur.
+	 *
+	 * @return FolderModel Retourne une instance de `FolderModel` représentant le dossier par défaut de l'utilisateur.
 	 */
 	function folder(): Model
 	{
@@ -135,7 +153,9 @@ class UserModel extends Model
 	}
 
 	/**
-	 * @return array Returns all the user's folders.
+	 * Récupère tous les dossiers appartenant à l'utilisateur.
+	 *
+	 * @return array Un tableau d'instances de `FolderModel` représentant les dossiers de l'utilisateur.
 	 */
 	function folders(): array
 	{
@@ -143,7 +163,10 @@ class UserModel extends Model
 	}
 
 	/**
-	 * @return array|null Returns the informations of the user's files.
+	 * Récupère tous les fichiers appartenant à l'utilisateur.
+	 *
+	 * @return array|null Un tableau d'instances de `FileModel` représentant les fichiers de l'utilisateur,
+	 *                    ou null si aucun fichier n'est trouvé.
 	 */
 	function files(): ?array
 	{
@@ -161,6 +184,12 @@ class UserModel extends Model
 		return null;
 	}
 
+	/**
+	 * Récupère tous les fichiers partagés avec l'utilisateur par d'autres utilisateurs.
+	 *
+	 * @return array|null Un tableau d'instances de `FileModel` représentant les fichiers partagés avec l'utilisateur,
+	 *                    ou null si aucun fichier partagé n'est trouvé.
+	 */
 	function sharedFiles(): ?array
 	{
 		$filesUsers = FileUserModel::where('user_id', auth_user()->id);

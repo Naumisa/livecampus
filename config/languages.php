@@ -2,6 +2,7 @@
 
 /**
  * Charge et retourne le tableau de traductions pour une langue spécifiée.
+ *
  * @param string $language Le code de la langue (ex : 'fr').
  * @return array Le tableau des traductions.
  */
