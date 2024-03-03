@@ -84,6 +84,14 @@ return [
 	// Page des informations de l'utilisateur
 	'profile.title' => 'Vos informations',
 	'profile.edit.title' => 'Vos informations',
+	'profile.edit' => 'Editer',
+	'profile.cancel' => 'Annuler',
+	'profile.send' => 'Envoyer',
+	'profile.username' => 'Nom d\'utilisateur',
+	'profile.email' => 'Adresse mail',
+	'profile.edit_password' => 'Changer votre mot de passe',
+	'profile.password' => 'Mot de passe',
+	'profile.password_confirm' => 'Confirmation du mot de passe',
 
 	'show-users.title' => 'Admin > Utilisateur',
 	'show-users.users_count' => 'Nombre d\'utilisateurs inscris',

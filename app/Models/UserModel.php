@@ -66,10 +66,12 @@ class UserModel extends Model
 	public ?string $remember_token = '';
 	public int $role = 0;
 
-	public static function create(array $data): Model
+	public static function create(array $data): ?Model
 	{
 		$data['username'] = explode('@', $data['email'])[0];
 		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+
+		unset($data['password_confirmation']);
 
 		return parent::create($data);
 	}

@@ -98,41 +98,64 @@ function profile(): array
  */
 function edit() : array
 {
-    # Get current user's datas
-    $user = auth_user();
+	# Get current user's datas
+	$user = auth_user();
 
-    # Get user's new datas from the form
-    $new_username = trim(
-        filter_input(
-            INPUT_POST,
-            'username',
-            FILTER_DEFAULT
-        )
-    );
-    $new_email = trim(
-        filter_input(
-            INPUT_POST,
-            'email',
-            FILTER_DEFAULT
-        )
-    );
+	# Get user's new datas from the form
+	$new_username = trim(
+		filter_input(
+			INPUT_POST,
+			'username',
+			FILTER_DEFAULT
+		)
+	);
+	$new_email = trim(
+		filter_input(
+			INPUT_POST,
+			'email',
+			FILTER_DEFAULT
+		)
+	);
+	$new_password = trim(
+		filter_input(
+			INPUT_POST,
+			'password',
+			FILTER_DEFAULT
+		)
+	);
+	$confirm_password = trim(
+		filter_input(
+			INPUT_POST,
+			'password_confirm',
+			FILTER_DEFAULT
+		)
+	);
 
-    # Update user's datas if modified
-    if(
-        $user->email !== $new_email ||
-        $user->username !== $new_username
-    ){
-        $user->email = $new_email;
-        $user->username = $new_username;
-        $user->save();
-    };
-    $data['user'] = $user;
+	# Update user's datas if modified
+	if (
+		$user->email !== $new_email && !empty($new_email) ||
+		$user->username !== $new_username && !empty($new_username)||
+		!empty($new_password) && !empty($confirm_password)
+	) {
+		$user->email = !empty($new_email) ? $new_email : $user->email;
+		$user->username = !empty($new_username) ? $new_username : $user->username;
+		if ($new_password !== $confirm_password)
+		{
+			log_session("Le mot de passe ne correspond pas.");
+			header('Location: /user/profile');
+			die();
+		}
+		$user->password = !empty($new_password) ? password_hash($new_password, PASSWORD_DEFAULT) : $user->password;
+		if (!$user->save()) {
+			log_session("L'adresse mail que vous venez d'entrer existe déjà.");
+		}
+	}
+	else {
+		log_session("Vous n'avez changé aucun champ.");
+	}
 
-    # Go back to profile page
-    return [
-        'data' => $data,
-        'view' => 'user/profile'
-    ];
+	header('Location: /user/profile');
+	die();
 }
 
 /**
@@ -168,7 +191,8 @@ function login_attempt(): array
 		$data[$field] = filter_input(INPUT_POST, $field);
 		if (!$data[$field]) {
 			$isValid = false;
-			$error .= "Le champ $field doit être rempli. ";
+			header('Location: /user/login');
+			log_session("Le champ $field doit être rempli. ");
 		}
 	}
 
@@ -191,16 +215,19 @@ function login_attempt(): array
 				die();
 			}
 
-			$result['error'] = "Le mot de passe ne correspond pas.";
+			header('Location: /user/login');
+			log_session("Le mot de passe ne correspond pas.");
 		}
 		else
 		{
-			$result['error'] = "Aucun utilisateur n'existe pour cette adresse e-mail.";
+			header('Location: /user/login');
+			log_session("Aucun utilisateur n'existe pour cette adresse e-mail.");
 		}
 	}
 	else
 	{
-		$result['error'] = [ 'error' => $error ];
+		header('Location: /user/login');
+		log_session($error);
 	}
 
 	return [
@@ -224,12 +251,8 @@ function logout(): array
 	unset($_SESSION['token']);
 	unset($_SESSION['email']);
 
-	$data = [];
-
-	return [
-		'data' => $data,
-		'view' => "user/auth/logout",
-	];
+	header('Location: /home');
+	die();
 }
 
 /**
@@ -265,34 +288,32 @@ function register_attempt(): array
 		$data[$field] = filter_input(INPUT_POST, $field);
 		if (!$data[$field]) {
 			$isValid = false;
-			$error .= "Le champ $field doit être rempli. ";
+			header('Location: /user/register');
+			log_session("Le champ $field doit être rempli.");
 		}
 	}
 
 	$isConform = $data['user_password'] === $data['user_password_confirmation'];
 	if (!$isConform)
 	{
-		$error .= "Le champ confirmation ne correspond pas au mot de passe entré.";
+		header('Location: /user/register');
+		log_session("Le champ confirmation ne correspond pas au mot de passe entré.");
 		$isValid = false;
 	}
 
 	$result = [];
 	if ($isValid) {
-		$findUser = new UserModel;
-		$findUser = $findUser->first('email', $data['user_email']);
+		$findUser = UserModel::first('email', $data['user_email']);
 
-		if ($findUser == null)
+		if (empty($findUser))
 		{
-			$user = new UserModel;
-
 			$newData = [];
 			foreach ($data as $key => $value)
 			{
 				$newData[str_replace('user_', '', $key)] = $value;
 			}
 
-			$user->create($newData);
-
+			$user = UserModel::create($newData);
 			$user->generate_token();
 			$user->save();
 
@@ -305,12 +326,14 @@ function register_attempt(): array
 		}
 		else
 		{
-			$result[] = [ 'error' => "Un autre utilisateur existe déjà pour cette adresse e-mail." ];
+			header('Location: /user/register');
+			log_session("Un autre utilisateur existe déjà pour cette adresse e-mail.");
 		}
 	}
 	else
 	{
-		$result[] = [ 'error' => $error ];
+		header('Location: /user/register');
+		log_session($error);
 	}
 
 	return [
