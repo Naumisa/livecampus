@@ -35,12 +35,8 @@ function upload(): array
 			die();
         }
 		else {
-            $targetDir = auth_user()->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
-
-            if (!file_exists($targetDir))
-			{
-                mkdir($targetDir, 0777, true); // Créer le dossier s'il n'existe pas
-            }
+			global $root;
+			$targetDir = $root . app_get_path('public_storage') . "uploads/" . auth_user()->folder()->name_random . "/"; // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
             // Téléchargement du fichier avec un nom différent
             $newFileName = "file_" . time() . "." . $fileExtension;
@@ -53,8 +49,9 @@ function upload(): array
 
 				try {
                     $fileModel = new FileModel();//Création du fichier
-                    $data = $fileModel->fill($name_origine, $newFileName);//L'envoy du fichier
+                    $data = $fileModel->fill($name_origine, $newFileName, auth_user()->folder()->id); //L'envoi du fichier
                     $data['owner_id'] = auth_user()->id;//Recherche de l'id
+					$data['type'] = mime_content_type($newTargetFile);
                     $fileModel->create($data);
 
 					header('Location: /user/dashboard');
@@ -76,12 +73,40 @@ function upload(): array
 
     $user = auth_user();
 	$data['files'] = $user->files();
-	$data['user_storage_path'] = $user->storage_path();
+	$data['user_storage_path'] = $user->folder();
 
     return [
         'data' => $data,
         'view' => "user/dashboard",
     ];
+}
+
+function download()
+{
+	$fileId = routes_get_params('id');
+	$file = FileModel::find($fileId);
+
+	$user = auth_user();
+	$userId = $user->id;
+
+	$authUsers = $file->users();
+
+	if (array_key_exists($userId, $authUsers))
+	{
+		header("Content-Type: $file->type");
+		header("Content-Transfer-Encoding: Binary");
+		header("Content-Disposition: attachment; filename=\"$file->name_origin\"");
+		header("Content-Length: " . filesize($file->path()));
+		readfile($file->path());
+		$file->download_count++;
+		$file->save();
+		die();
+	}
+	else
+	{
+		header('Location: /user/dashboard');
+		die();
+	}
 }
 
 /**
@@ -96,14 +121,12 @@ function delete(): array
     // doit vérifier si le fichier appartient bien à l'utilisateur connecté
     $user = auth_user();
     $userId = $user->id;
-    // Chemin du fichier
-    $targetDir = $user->storage_path(); // Dossier de stockage basé sur le hachage de l'ID de l'utilisateur
 
     // cherche le fichier avec l'id $fileId
     $file = FileModel::find($fileId);
     $fileUserId = $file->owner_id;
     if ($fileUserId === $userId) {
-        unlink($targetDir . $file->name_random);
+        unlink($file->path());
         $file->delete();
 
 		header('Location: ' . routes_go_to_route('dashboard'));
@@ -112,7 +135,7 @@ function delete(): array
 
     $user = auth_user();
 	$data['files'] = $user->files();
-	$data['user_storage_path'] = $user->storage_path();
+	$data['user_storage_path'] = $user->folder();
 
     return [
         'data' => $data,
@@ -141,7 +164,7 @@ function share(): array
 		// ajoute a la table file_user les donnees
 		FileUserModel::create($data);
 
-		header('Location: ' . routes_go_to_route('files.shared'));
+		header('Location: ' . routes_go_to_route('dashboard'));
 	}
 
 	die();
@@ -156,14 +179,14 @@ function shared(): array
 {
 	$user = auth_user();
 	$data['files'] = $user->sharedFiles();
-	$data['user_storage_path'] = $user->storage_path();
+	$data['user_storage_path'] = $user->folder();
 
 	if (!empty($data['files']) > 0) {
 		$disk_space = 0;
 
 		foreach ($data['files'] as $file)
 		{
-			$disk_space += filesize($file->data['path'] . $file->name_random);
+			$disk_space += filesize($file->path());
 		}
 
 		$data['disk_space'] = $disk_space;

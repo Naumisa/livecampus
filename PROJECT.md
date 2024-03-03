@@ -32,11 +32,11 @@ Le site devra disposer des fonctionnalités suivantes :
   - [x] Se déconnecter
 - Pour une personne authentifiée
   - [x] Modifier son profil
-  - [ ] Envoyer un fichier
-  - [ ] Télécharger un fichier
-  - [ ] Voir combien de fois un fichier a été téléchargé
-  - [ ] Supprimer un fichier envoyé
-  - [ ] Réserver le téléchargement uniquement à un utilisateur en particulier
+  - [x] Envoyer un fichier
+  - [x] Télécharger un fichier
+  - [x] Voir combien de fois un fichier a été téléchargé
+  - [x] Supprimer un fichier envoyé
+  - [x] Réserver le téléchargement uniquement à un utilisateur en particulier
 
 ## Détail des fonctionnalités
 

@@ -23,9 +23,11 @@ class FileUserModel extends Model
     protected static array $foreign_fields = [
         'user_id' => [
             'refer_to' => 'users(id)',
+	        'on_delete' => 'cascade',
         ],
         'file_id' => [
             'refer_to' => 'files(id)',
+	        'on_delete' => 'cascade',
         ],
     ];
 

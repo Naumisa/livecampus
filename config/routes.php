@@ -22,6 +22,7 @@ function routes_get_navigation(): array
 		'user/edit'             	=> ['POST', "UserController@edit", 					'profile.edit', 			1],
 
 		'files/upload' 				=> ['POST', "FileController@upload", 				'file.upload', 				1],
+		'files/download/{id}'		=> ['FILE', "FileController@download", 				'file.download',			1],
 		'files/delete/{id}' 		=> ['GET', 	"FileController@delete", 				'file.delete', 				1],
 		'files/share' 	            => ['POST', "FileController@share", 				'file.share', 				1],
 		'files/shared' 				=> ['GET', 	"FileController@shared", 				'files.shared', 			1],
@@ -112,6 +113,12 @@ function routes_get_page(): string
 	return ltrim($page, '/');
 }
 
+function routes_is_file(): bool
+{
+	$route = routes_get_route();
+	return $route[0] === "FILE";
+}
+
 /**
  * Détermine la route actuelle en se basant sur l'URL demandée.
  * Si des paramètres sont présents dans l'URL, ils sont traités et stockés.
@@ -171,7 +178,7 @@ function routes_get_view(): void
 	$authLevel = $route[3];
 	$user = auth_user();
 
-	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $method;
+	$isGoodRequest = $_SERVER['REQUEST_METHOD'] === $method || routes_is_file();
 
 	if (!isLoggedIn() && $authLevel !== 0) {
 		$route = routes_get_route('home');

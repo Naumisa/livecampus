@@ -53,6 +53,7 @@ return [
 	'file_info.count' => 'fois',
 	'file_info.last_updated' => 'Dernière mise à jour',
 	'file_info.actions' => 'Actions',
+	'file_info.action_download' => 'Télécharger',
 	'file_info.action_share' => 'Partager',
 	'file_info.action_delete' => 'Supprimer',
 

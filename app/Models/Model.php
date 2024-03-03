@@ -108,10 +108,7 @@ abstract class Model
 
 	public static function find(int $id): ?self
 	{
-		$instance = new static();
-		$rows = static::fetch('id', $id);
-
-		return $instance->parse_in_model($rows[0]);
+		return static::first('id', $id);
 	}
 
 	public static function first(string $column, string $value): ?self

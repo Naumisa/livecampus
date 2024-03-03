@@ -1,9 +1,8 @@
 <?php
-require __DIR__.'/../vendor/autoload.php';
-
-require_once ("../config/app.php");
-
 $root = __DIR__;
+
+require $root . '/../vendor/autoload.php';
+require_once ("../config/app.php");
 ?>
 
 <!DOCTYPE html>

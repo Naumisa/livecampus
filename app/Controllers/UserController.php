@@ -56,14 +56,14 @@ function dashboard(): array
 {
 	$user = auth_user();
 	$data['files'] = $user->files();
-	$data['user_storage_path'] = $user->storage_path();
+	$data['user_storage_path'] = $user->folder()->name_random;
 
 	if (!empty($data['files']) > 0) {
 		$disk_space = 0;
 
 		foreach ($data['files'] as $file)
 		{
-			$disk_space += filesize($file->data['path'] . $file->name_random);
+			$disk_space += filesize($file->path());
 		}
 
 		$data['disk_space'] = $disk_space;

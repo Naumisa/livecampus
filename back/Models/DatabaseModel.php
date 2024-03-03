@@ -81,7 +81,19 @@ class DatabaseModel
 			{
 				foreach ($foreignKeys as $fk => $def)
 				{
-					$query .= "ALTER TABLE $table ADD CONSTRAINT fk_$fk FOREIGN KEY ($fk) REFERENCES {$def['refer_to']};";
+					if (isset($def['referred_by']))
+					{
+						$query .= "ALTER TABLE {$def['referred_by']['table']} ADD CONSTRAINT fk_{$def['referred_by']['table']}_$fk FOREIGN KEY ({$def['referred_by']['column']}) REFERENCES $table($fk)";
+						$query .= !isset($def['referred_by']['on_delete']) ? '' : " ON DELETE {$def['referred_by']['on_delete']}";
+						$query .= !isset($def['referred_by']['on_update']) ? '' : " ON UPDATE {$def['referred_by']['on_update']}";
+					}
+					else
+					{
+						$query .= "ALTER TABLE $table ADD CONSTRAINT fk_$table"."_"."$fk FOREIGN KEY ($fk) REFERENCES {$def['refer_to']}";
+						$query .= !isset($def['on_delete']) ? '' : " ON DELETE {$def['on_delete']}";
+						$query .= !isset($def['on_update']) ? '' : " ON UPDATE {$def['on_update']}";
+					}
+					$query .= ";";
 				}
 			}
 
@@ -216,6 +228,22 @@ class DatabaseModel
 		catch (PDOException $e) {
 			log_file("Erreur lors de la suppression dans la table $table : " . $e->getMessage());
 			return false;
+		}
+	}
+
+	public function set_foreign_key_check(bool $value): void
+	{
+		$value = (int) $value;
+		$query = "SET FOREIGN_KEY_CHECKS = $value";
+
+		try {
+			$result = $this->pdo->prepare($query);
+			$result->execute();
+			return;
+		}
+		catch (PDOException $e) {
+			log_file("Erreur lors de la modification du champ FOREIGN_KEY_CHECKS : " . $e->getMessage());
+			return;
 		}
 	}
 }

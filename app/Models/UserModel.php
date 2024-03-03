@@ -2,6 +2,7 @@
 
 namespace app\Models;
 
+use back\Models\DatabaseModel;
 use Random\RandomException;
 
 class UserModel extends Model
@@ -33,6 +34,12 @@ class UserModel extends Model
 			'unique' => false,
 			'query' => 'VARCHAR(255) NOT NULL',
 		],
+		'default_folder_id' => [
+			'type' => 'int',
+			'required' => false,
+			'unique' => true,
+			'query' => 'INT',
+		],
 		'remember_token' => [
 			'type' => 'string',
 			'required' => false,
@@ -58,11 +65,11 @@ class UserModel extends Model
 			'query' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
 		],
 	];
-	protected static array $foreign_fields = [];
 
 	public string $username = '';
 	public string $email = '';
 	public string $password = '';
+	public int $default_folder_id = 0;
 	public ?string $remember_token = '';
 	public int $role = 0;
 
@@ -70,10 +77,20 @@ class UserModel extends Model
 	{
 		$data['username'] = explode('@', $data['email'])[0];
 		$data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+		$data['default_folder_id'] = 0;
 
 		unset($data['password_confirmation']);
 
-		return parent::create($data);
+		static::$db->set_foreign_key_check(false);
+
+		$user = parent::create($data);
+
+		$folder = FolderModel::create(['name_origin' => '/', 'user' => $user]);
+		$user->default_folder_id = $folder->id;
+		$user->save();
+
+		static::$db->set_foreign_key_check(true);
+		return $user;
 	}
 
 	/**
@@ -90,7 +107,7 @@ class UserModel extends Model
 		return [
 			'username' => $username,
 			'email' => $email,
-			'password' => password_hash($password, PASSWORD_DEFAULT),
+			'password' => $password,
 			'role' => $role,
 		];
 	}
@@ -110,12 +127,19 @@ class UserModel extends Model
 	}
 
 	/**
-	 * @return string Returns the storage path of the user's files.
+	 * @return Model Returns the FolderModel of the user's files.
 	 */
-	function storage_path(): string
+	function folder(): Model
 	{
-		global $root;
-		return $root . app_get_path('public_storage') . "uploads/" . md5($this->email) . "/";
+		return FolderModel::find($this->default_folder_id);
+	}
+
+	/**
+	 * @return array Returns all the user's folders.
+	 */
+	function folders(): array
+	{
+		return FolderModel::where('owner_id', $this->default_folder_id);
 	}
 
 	/**
@@ -128,7 +152,7 @@ class UserModel extends Model
 		if (!empty($files) > 0) {
 			foreach ($files as $file)
 			{
-				$file->data['path'] = $this->storage_path();
+				$file->data['path'] = $this->folder();
 			}
 
 			return $files;
@@ -149,7 +173,7 @@ class UserModel extends Model
 				$file = FileModel::find($file_id);
 				$owner_id = $file->owner_id;
 				$owner = UserModel::find($owner_id);
-				$file->data['path'] = $owner->storage_path();
+				$file->data['path'] = $owner->folder();
 				$file->data['owner_email'] = $owner->email;
 				$files[] = $file;
 			}

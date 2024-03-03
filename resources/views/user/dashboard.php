@@ -51,10 +51,10 @@ function filesize_formatted(int $size): string
                 </thead>
                 <tbody>
                     <?php foreach ($files as $file) : ?>
-	                    <?php $extension = pathinfo($file->data['path'] . $file->name_random, PATHINFO_EXTENSION) ?>
+	                    <?php $extension = pathinfo($file->path() . $file->name_random, PATHINFO_EXTENSION) ?>
                         <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
                             <th scope="row" class="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                <?= str_replace(".$extension", '', $file->name_origine) ?>
+                                <?= str_replace(".$extension", '', $file->name_origin) ?>
                             </th>
                             <td class="px-4 py-2">
                                 <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
@@ -62,13 +62,18 @@ function filesize_formatted(int $size): string
                                 </span>
                             </td>
                             <td class="px-4 py-2">
-                                <?= filesize_formatted(filesize($file->data['path'] . $file->name_random)) ?>
+                                <?= filesize_formatted(filesize($file->path())) ?>
                             </td>
                             <td class="px-4 py-2"><?= $file->download_count . " " . lang_get('file_info.count') ?></td>
                             <td class="px-4 py-2"><?= $file->data['owner_email'] ?? auth_user()->email ?></td>
                             <td class="px-4 py-2"><?= $file->updated_at ?></td>
                             <td class="px-4 py-2">
                                 <div class="flex items-center space-x-2">
+	                                <a href="<?= routes_go_to_route('file.download', ['id' => $file->id]) ?>" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+		                                <span class="flex-1 ms-3 whitespace-nowrap">
+			                                <?= lang_get('file_info.action_download') ?>
+                                        </span>
+	                                </a>
 	                                <?php if ($file->owner_id === auth_user()->id): ?>
 		                                <button onclick="shareFile(<?= $file->id ?>)" data-modal-target="share-modal" data-modal-toggle="share-modal" type="button" class="flex items-center pr-2.5 py-0.5 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
 			                                <span class="flex-1 ms-3 whitespace-nowrap">

@@ -2,7 +2,9 @@
 
 use app\Models\FileModel;
 use app\Models\FileUserModel;
+use app\Models\FolderModel;
 use app\Models\UserModel;
+use back\Models\DatabaseModel;
 
 /**
  * Récupère le chemin d'accès spécifié à partir d'un ensemble prédéfini de chemins.
@@ -68,8 +70,14 @@ foreach ($configs as $config) {
 }
 
 // Création automatique des tables et d'un utilisateur admin.
+$pdo = new DatabaseModel;
+$pdo->set_foreign_key_check(false);
+
 $auto_user = new UserModel();
 $auto_user->migrate();
+
+$auto_folder = new FolderModel();
+$auto_folder->migrate();
 
 $auto_file = new FileModel();
 $auto_file->migrate();
@@ -77,10 +85,12 @@ $auto_file->migrate();
 $auto_file_user = new FileUserModel();
 $auto_file_user->migrate();
 
-/*if ($auto_user->find(1) == null) {
+$pdo->set_foreign_key_check(true);
+
+if (!UserModel::find(1)) {
 	$userArray = $auto_user->fill('admin', 'admin@email.com', 'password', 1);
 	$auto_user->create($userArray);
-}*/
+}
 
 // Initialisation du système de liens de navigation selon le statut d'authentification
 $loggedOutLinks = [
@@ -97,5 +107,10 @@ $loggedLinks = [
 $adminLinks = [
 	'show-users' => 'navigation.users',
 ];
+
+if (routes_is_file())
+{
+	routes_get_view();
+}
 
 ob_start();
