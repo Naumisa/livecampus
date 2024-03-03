@@ -1,10 +1,9 @@
-
 // Enabling user edit form
 function enableUserEditForm(){
-    document.getElementById('username')
-        .removeAttribute('disabled')
-        .focus()
-    ;
+    const username_input = document.getElementById('username');
+    
+    username_input.removeAttribute('disabled');
+    username_input.focus();
     document.getElementById('email').removeAttribute('disabled');
     document.getElementById('cancel').removeAttribute('hidden');
     document.getElementById('submit').removeAttribute('hidden');
