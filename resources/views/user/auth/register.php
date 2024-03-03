@@ -27,6 +27,13 @@
 					<button type="submit" class="w-full bg-gray-50 hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:bg-gray-700 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
 						<?= lang_get('register.title') ?>
 					</button>
+
+					<p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+						<?= lang_get('register.have_account') ?>
+						<span class="text-blue-700">
+							<a href="<?= routes_go_to_route('login') ?>"><?= lang_get('navigation.login') ?></a>
+						</span>
+					</p>
 				</form>
 			</div>
 		</div>

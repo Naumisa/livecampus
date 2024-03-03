@@ -11,6 +11,8 @@
 */
 return [
 	'title' => 'LiveTransfer',
+	'subtitle' => 'Mettre en ligne, c\'est sécuriser vos fichiers !',
+	'get_started' => 'Démarrer maintenant',
 
 	// Navigation
 	'navigation.title' => 'LiveTransfer',
@@ -71,6 +73,7 @@ return [
 	'login.title' => 'Connexion',
 	'login.email' => 'Adresse e-mail',
 	'login.password' => 'Mot de passe',
+	'login.dont_have_account' => 'Pas encore de compte chez nous ?',
 
 	// Page de Déconnexion
 	'logout.title' => 'Déconnexion',
@@ -83,6 +86,7 @@ return [
 	'register.email' => 'Adresse e-mail',
 	'register.password' => 'Mot de passe',
 	'register.password_confirmation' => 'Confirmation du mot de passe',
+	'register.have_account' => 'Vous disposez déjà d\'un compte chez nous ?',
 
 	// Page des informations de l'utilisateur
 	'profile.title' => 'Vos informations',
