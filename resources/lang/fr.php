@@ -39,6 +39,7 @@ return [
 	'dashboard.total_size' => 'Taille sur stockage',
 	'dashboard.showing' => 'Affichage',
 	'dashboard.showing_of' => 'sur',
+	'dashboard.share_to' => 'Destinataire',
 
 	// Page de Téléversement
 	'file.title' => 'Téléverser',

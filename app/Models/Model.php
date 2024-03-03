@@ -45,11 +45,11 @@ abstract class Model
 		}
 	}
 
-	public function save(): void
+	public function save(): bool
 	{
 		if ($this->state === self::MODEL_DELETED) {
 			log_file("Tentative de mise à jour d'un Model précédemment supprimé.");
-			return;
+			return false;
 		}
 
 		$this->updated_at = date('Y-m-d H:i:s');
@@ -59,7 +59,10 @@ abstract class Model
 
 		if (!static::$db->update(static::$table, $this->id, $data)) {
 			log_file("Une erreur est survenue lors de la tentative de sauvegarde du Model.");
+			return false;
 		}
+
+		return true;
 	}
 
 	public function delete(): void

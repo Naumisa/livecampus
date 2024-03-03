@@ -23,7 +23,7 @@ function routes_get_navigation(): array
 
 		'files/upload' 				=> ['POST', "FileController@upload", 				'file.upload', 				1],
 		'files/delete/{id}' 		=> ['GET', 	"FileController@delete", 				'file.delete', 				1],
-		'files/share/{id}/{email}' 	=> ['GET', 	"FileController@share", 				'file.share', 				1],
+		'files/share' 	            => ['POST', "FileController@share", 				'file.share', 				1],
 		'files/shared' 				=> ['GET', 	"FileController@shared", 				'files.shared', 			1],
 
 		'admin/users'				=> ['GET', 	"UserController@show_users", 			'show-users', 				2],
@@ -77,7 +77,8 @@ function routes_go_to_route(string $key, ?array $params = null): string
 
 	foreach ($routes as $route => $values) {
 		if ($values[2] === $key) {
-			if (isLoggedIn() && $user->role >= $values[3] - 1 && $values[3] !== 0 || !isLoggedIn() && $values[3] === 0 ) {
+			if (isLoggedIn() && $user->role >= $values[3] - 1 && $values[3] !== 0 ||
+				!isLoggedIn() && $values[3] === 0 ) {
 				if (isset($params))
 				{
 					foreach ($params as $param => $value) {
@@ -167,7 +168,6 @@ function routes_get_view(): void
 	$route = routes_get_route();
 	$method = $route[0];
 	$controller = explode('@', $route[1]);
-	$route_name = $route[2];
 	$authLevel = $route[3];
 	$user = auth_user();
 
@@ -177,20 +177,24 @@ function routes_get_view(): void
 		$route = routes_get_route('home');
 		$controller = explode('@', $route[1]);
 		$route_name = $route[2];
+		$message = "L'utilisateur n'a pas les accès requis pour afficher cette page.";
 		$isGoodRequest = false;
 	}
 	elseif (isLoggedIn() && $authLevel === 0) {
 		$route = routes_get_route('dashboard');
 		$controller = explode('@', $route[1]);
 		$route_name = $route[2];
+		$message = "L'utilisateur n'a pas les accès requis pour afficher cette page.";
 		$isGoodRequest = false;
 	}
 
 	if (!$isGoodRequest) {
-		header("Location: " . routes_go_to_route($route[2]));
-		log_file("Erreur dans la récupération des informations de la route demandée : l'utilisateur n'a pas les accès requis.");
+		header("Location: " . routes_go_to_route($route_name ?? 'home'));
+		log_file($message ?? "La requête qui a été passée ne correspond pas à celle attendue.");
 		die();
 	}
+
+	$route_name = $route[2];
 
 	$path = app_get_path('controllers');
 	include_once("$path/$controller[0].php");

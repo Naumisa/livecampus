@@ -22,3 +22,14 @@ function disableUserEditForm(){
     document.getElementById('submit').setAttribute('hidden', true);
     document.getElementById('edit').removeAttribute('hidden');
 };
+
+// Set the good ID for the file user wanted to share.
+function shareFile(id) {
+    const inputs = document.querySelectorAll('input');
+
+    inputs.forEach(function(input) {
+        if (input.name === 'file') {
+            input.setAttribute('value', id);
+        }
+    })
+}

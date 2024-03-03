@@ -125,36 +125,26 @@ function share(): array
 	// recupere l'email saisie de l'utilisateur à qui partager le fichier
 	$userMail = filter_input(INPUT_POST, 'mail_to_share'); //paramettre a modifier en fonction du button
 	// recupere les donnees de l'utilisateur correpondant a l'email
-	$user = new UserModel;
-	$user->first('email', $userMail);
-	if ($user->email === null)
+	$user = UserModel::first('email', $userMail);
+	if ($user === null)
 	{
-		log_file("Cette e-mail n'existe pas");
+		log_session("Cette e-mail n'existe pas");
+		header('Location: ' . routes_go_to_route('dashboard'));
 	}
 	else {
 		// recupere l'id de l'utilisateur
 		$userId = $user->id;
 		// recupere l'id du fichier
-		$fileId = (int)routes_get_params('id');
+		$fileId = filter_input(INPUT_POST, 'file');
 		// creer les donnees a envoyer
 		$data = ['user_id' => $userId, 'file_id' => $fileId];
 		// ajoute a la table file_user les donnees
-		$fileUser = new FileUserModel;
-		$fileUser->create($data);
+		FileUserModel::create($data);
 
 		header('Location: ' . routes_go_to_route('files.shared'));
-		die();
 	}
 
-
-	$user = auth_user();
-	$data['files'] = $user->files();
-	$data['user_storage_path'] = $user->storage_path();
-
-	return [
-		'data' => $data,
-		'view' => "user/dashboard",
-	];
+	die();
 }
 
 /**
