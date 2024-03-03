@@ -43,7 +43,24 @@ function get_user_with_token (string $token): ?Model
  * @return bool Retourne true si l'utilisateur est connecté, sinon false.
  */
 function isLoggedIn (): bool
-{ return isset($_SESSION['email']) && isset($_SESSION['token']) && $_SESSION['token'] != null; }
+{
+	if (isset($_SESSION['email']) && isset($_SESSION['token']) && $_SESSION['token'] != null)
+	{
+		$email = $_SESSION['email'];
+		$token = $_SESSION['token'];
+
+		$user = UserModel::first('email', $email);
+		if ($user !== null)
+		{
+			return $user->remember_token === $token;
+		}
+	}
+
+	unset($_SESSION['email']);
+	unset($_SESSION['token']);
+
+	return false;
+}
 
 /**
  * Vérifie si l'utilisateur actuellement authentifié est un administrateur.
